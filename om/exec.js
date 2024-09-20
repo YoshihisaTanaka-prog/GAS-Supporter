@@ -70,7 +70,6 @@ const obj = {
         case 3:
           if(char == '"'){
             status = 2;
-            cachedParam += '"';
           }
           cachedParam += char
           break;
