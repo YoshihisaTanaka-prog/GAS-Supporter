@@ -56,8 +56,7 @@ const obj = {
               cachedParam = "";
             }
           } else if(char == "&"){
-            const unit2 = {command: Object.freeze(unit.command), params: Object.freeze(unit.params)};
-            this.formattedCommands.push(unit2);
+            this.formattedCommands.push({command: Object.freeze(unit.command), params: Object.freeze(unit.params), rawCommand: Object.freeze(unit.command + " " + unit.params.join(" "))});
             status = 0;
             unit.command = "";
             unit.params = [];
