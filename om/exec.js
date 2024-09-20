@@ -2,15 +2,15 @@ const { spawn } = require('child_process');
 
 const obj = {
   outputData: [],
-  outputUnit: {},
-  funcUnit: function(command, params, rawCommand){
+  outputUnit: {command: "", results: []},
+  funcUnit: function(command, params){
     const self = this;
     const childProcess = spawn(command, params);
-    self.outputUnit = {command: rawCommand, result: []};
+    self.outputUnit = {command: command + " " + params.join(" "), result: []};
     childProcess.stdout.on('data', function(chunk){
       console.log(chunk.toString());
       for(const line of chunk.toString().split("\n").map( (l) => l.replaceAll("\r", "").replaceAll("\t", "    ") )){
-        self.outputUnit.result.push(line);
+        self.outputUnit.results.push(line);
       }
     });
     childProcess.stdout.on("close", function(){
@@ -41,7 +41,7 @@ const obj = {
           if(char == " "){
             status = 2;
           } else if(char == "&"){
-            this.formattedCommands.push({command: Object.freeze(unit.command), params: Object.freeze(unit.params), rawCommand: Object.freeze(unit.command + " " + unit.params.join(" "))});
+            this.formattedCommands.push({command: Object.freeze(unit.command), params: Object.freeze(unit.params)});
             status = 0;
             unit.command = "";
             unit.params = [];
@@ -56,7 +56,7 @@ const obj = {
               cachedParam = "";
             }
           } else if(char == "&"){
-            this.formattedCommands.push({command: Object.freeze(unit.command), params: Object.freeze(unit.params), rawCommand: Object.freeze(unit.command + " " + unit.params.join(" "))});
+            this.formattedCommands.push({command: Object.freeze(unit.command), params: Object.freeze(unit.params)});
             status = 0;
             unit.command = "";
             unit.params = [];
@@ -79,15 +79,14 @@ const obj = {
       }
     }
     unit.params.push(cachedParam);
-    this.formattedCommands.push({command: Object.freeze(unit.command), params: Object.freeze(unit.params), rawCommand: Object.freeze(unit.command + " " + unit.params.join(" "))});
+    this.formattedCommands.push({command: Object.freeze(unit.command), params: Object.freeze(unit.params)});
   },
   formattedCommands: [],
   mainFunc: function(command="", onClose){
     this.onClose = onClose;
     this.formatCommand(command);
     const unit = this.formattedCommands.shift();
-    console.log(unit);
-    this.funcUnit(unit.command, unit.params, unit.rawCommand);
+    this.funcUnit(unit.command, unit.params);
   }
 }
 
