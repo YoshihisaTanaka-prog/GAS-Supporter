@@ -6,7 +6,7 @@ const obj = {
   funcUnit: function(command, params){
     const self = this;
     const childProcess = spawn(command, params);
-    self.outputUnit = {command: command + " " + params.join(" "), results: []};
+    self.outputUnit = {command: command + " " + params.map( (p) => p.includes(" ") ? '"' + p + '"' : p ).join(" "), results: []};
     childProcess.stdout.on('data', function(chunk){
       console.log(chunk.toString());
       for(const line of chunk.toString().split("\n").map( (l) => l.replaceAll("\r", "").replaceAll("\t", "    ") )){
