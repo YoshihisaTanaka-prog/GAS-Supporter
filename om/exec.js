@@ -87,6 +87,7 @@ const obj = {
     this.onClose = onClose;
     this.formatCommand(command);
     const unit = this.formattedCommands.shift();
+    console.log(unit);
     this.funcUnit(unit.command, unit.params, unit.rawCommand);
   }
 }
