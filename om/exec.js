@@ -2,16 +2,19 @@ const { spawn } = require('child_process');
 
 const obj = {
   outputData: [],
-  funcUnit: function(command, params){
+  outputUnit: {},
+  funcUnit: function(command, params, rawCommand){
     const self = this;
     const childProcess = spawn(command, params);
+    self.outputUnit = {command: rawCommand, result: []};
     childProcess.stdout.on('data', function(chunk){
       console.log(chunk.toString());
       for(const line of chunk.toString().split("\n").map( (l) => l.replaceAll("\r", "").replaceAll("\t", "    ") )){
-        self.outputData.push(line);
+        self.outputUnit.result.push(line);
       }
     });
     childProcess.stdout.on("close", function(){
+      self.outputData.push(self.outputUnit);
       if(self.formattedCommands.length == 0){
         if(self.onClose){
           self.onClose(self.outputData);
