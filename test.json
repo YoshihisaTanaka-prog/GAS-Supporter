@@ -1,0 +1,10 @@
+{
+  "text": "aaa",
+  "array": [
+    1,
+    true,
+    {
+      "key": "value"
+    }
+  ]
+}
