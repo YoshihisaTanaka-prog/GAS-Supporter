@@ -62,7 +62,9 @@ const obj = {
             unit.params = [];
           } else if(char == '"'){
             status = 3;
-            cachedParam += '"';
+            if(unit.command == "echo"){
+              cachedParam += '"';
+            }
           } else{
             cachedParam += char;
           }
@@ -70,8 +72,12 @@ const obj = {
         case 3:
           if(char == '"'){
             status = 2;
+            if(unit.command == "echo"){
+              cachedParam += '"';
+            }
+          } else {
+            cachedParam += char
           }
-          cachedParam += char
           break;
         default:
           break;
