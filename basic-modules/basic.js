@@ -1,8 +1,4 @@
 "use strict";
-const { readFileSync } = require("fs");
-
-const settingNames = ["app", "user"];
-const myRelativePath = "app/om/basic.js";
 
 const getType = function(object){
   var toString = Object.prototype.toString;
@@ -61,47 +57,4 @@ const isSameObject = function(object1, object2, ignoreArrayOrder=false){
   return false;
 }
 
-// for setting data
-const settingPathInfo = function(){
-  const mySplittedPath = myRelativePath.split("/").slice(0, -1);
-  const negativeLength = -mySplittedPath.length;
-  const returnObject = {};
-  if( isSameObject(process.argv[1].split("\\").slice(0, -1).slice(negativeLength), mySplittedPath)){
-    for(const key of settingNames){
-      returnObject[key] = "settings/" + key + "-data.json";
-    }
-  } else {
-    const rootPath = process.argv[1].split("\\").slice(0,-1).join("/");
-    for(const key of settingNames){
-      returnObject[key] = rootPath + "/settings/" + key + "-data.json";
-    }
-  }
-  return returnObject;
-}();
-
-class Setting {
-  constructor(path="", data){
-    this.path = Object.freeze(path);
-    this.data = data;
-  }
-  static new(path=""){
-    try {
-      const loadedText = readFileSync(path, "utf-8");
-      const loadedData = loadedText == "" ? {} : JSON.parse(loadedText);
-      return Object.freeze(new Setting(path, loadedData));
-    } catch (e) {
-      console.error(e);
-      return null;
-    }
-  }
-}
-
-const moduleObject = { getType, isSameObject };
-
-for(const key of Object.keys(settingPathInfo)){
-  moduleObject[key+"Setting"] = Setting.new(settingPathInfo[key]);
-}
-
-// console.log(moduleObject);
-
-module.exports = moduleObject;
+module.exports = { getType, isSameObject };

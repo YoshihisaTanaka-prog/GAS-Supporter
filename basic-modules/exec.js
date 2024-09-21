@@ -1,4 +1,7 @@
-const { spawn } = require('child_process');
+"use strict";
+
+const { spawn, execSync } = require('child_process');
+const { isatty } = require('tty');
 
 const obj = {
   outputData: [],
@@ -95,10 +98,33 @@ const obj = {
   }
 }
 
-const exec = function(command="", onClose=(data)=>{}){
-  obj.mainFunc(command, onClose);
+const runSpawn = function(command={}, onClose=()=>{}){
+  obj.mainFunc(command[process.platform], onClose);
 };
 
-exec("git add . & git commit -m \"test commit\"", (data)=>{console.log(data);});
+const runExec = function(command={}, isArrayType=true){
+  const resultText = execSync(command[process.platform]).toString();
+  if(isArrayType){
+    return resultText.split("\n").map( (line) => line.replaceAll("\r", "") );
+  } else {
+    return resultText;
+  }
+}
 
-module.exports = { exec };
+class SeparateCommand {
+  constructor(windows="", mac="", linux=""){
+    this.win32 = windows;
+    this.darwin = mac;
+    this.linux = linux;
+  }
+  runS(onClose=()=>{}){
+    runSpawn(this, onClose);
+  }
+  runE(isArrayType=true){
+    runExec(this, isArrayType);
+  }
+}
+
+
+
+module.exports = { SeparateCommand };
