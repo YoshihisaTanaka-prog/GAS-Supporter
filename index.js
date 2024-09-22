@@ -1,6 +1,6 @@
 "use strict";
 const express = require("express");
-const { SeparateCommand } = require("./basic-modules/exec");
+const Command= require("./basic-modules/exec")();
 const f = require("./basic-modules/file");
 const { read, isExists, isFile } = f([ 'css', 'html', 'js', 'json', 'txt' ]);
 
@@ -13,12 +13,7 @@ const server = app.listen(0, function(){
 });
 
 setTimeout(() => {
-  const command = new SeparateCommand(
-    "start chrome.exe http://localhost:" + server.address().port,
-    "open -a 'Google Chrome' 'http://localhost:'" + server.address().port,
-    "echo if you want to visit your web site, open http://localhost:" + server.address().port
-  );
-  command.runE();
+  Command.set("start chrome.exe http://localhost:" + server.address().port, "open -a 'Google Chrome' 'http://localhost:'" + server.address().port, "echo if you want to visit your web site, open http://localhost:" + server.address().port).runE();
 }, 500);
 
 app.get("/", async function(req, res){
