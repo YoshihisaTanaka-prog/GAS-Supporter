@@ -3,6 +3,8 @@
 const { spawn, execSync } = require('child_process');
 const { writeFileSync } = require('fs');
 
+console.log(__dirname);
+
 module.exports = function(characterEncodingIdentifier=65001){
 
   const runningSpawnObject = {
