@@ -2,7 +2,7 @@
 const express = require("express");
 const Command= require("./basic-modules/exec")();
 const f = require("./basic-modules/file");
-const { read, isExists, isFile } = f([ 'css', 'html', 'js', 'json', 'txt' ]);
+const { read, isFile } = f([ 'css', 'html', 'js', 'json', 'txt' ]);
 
 const appName = "GAS-Supporter";
 
@@ -21,7 +21,7 @@ app.get("/", async function(req, res){
 });
 
 app.get("*", async function(req, res){
-  if(isExists("html" + req.path)){
+  if(await isFile("html" + req.path)){
     res.sendFile(__dirname + "\\html" + req.path.replaceAll("/", "\\"));
   } else {
     res.send((await read("html/404.html")).replace("<title></title>", "<title>" + appName + "：お探しのページが見つかりません。</title>"));
