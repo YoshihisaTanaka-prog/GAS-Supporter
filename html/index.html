@@ -7,7 +7,14 @@
     <link rel="stylesheet" href="./css/main.css">
     <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
   </head>
+  <script>
+    const gasUrl = "%gasUrl%";
+    function test(){
+      window.location.href = gasUrl;
+    }
+  </script>
   <body>
     <h1 align="center">Test</h1>
+    <button onclick="test()">ドライブを選択</button>
   </body>
 </html>
