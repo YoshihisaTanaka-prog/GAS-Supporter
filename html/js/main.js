@@ -57,6 +57,8 @@ function selectedTab(id){
           localStorage.setItem('tabName', id);
         }
         $("#main").html(data);
+        $(".tab-script").remove();
+        $("body").append("<script src='/js/" + id + ".js' class='tab-script'></script>");
       });
       break;
   }

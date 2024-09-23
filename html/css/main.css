@@ -30,3 +30,13 @@ body {
 .selected-tab:hover {
   background-color: #777;
 }
+
+.app-li::marker:hover {
+  background-color: #aaa;
+}
+.app-li-span {
+  background-color: #fff;
+}
+.app-li-span:hover {
+  background-color: #ffa;
+}

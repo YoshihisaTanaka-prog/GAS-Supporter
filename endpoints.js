@@ -10,10 +10,12 @@ const cachedKeys = Object.keys(outputModule);
 
 const Auth      = require("./zz-endpoints/auth");
 const CreateApp = require("./zz-endpoints/create-app");
+const EditApp   = require("./zz-endpoints/edit-app");
 const Running   = require("./zz-endpoints/running");
 const Setup     = require("./zz-endpoints/setup");
+const ShowApp   = require("./zz-endpoints/show-app");
 
-for(const module of [Auth, CreateApp, Running, Setup]){
+for(const module of [Auth, CreateApp, EditApp, Running, Setup, ShowApp]){
   for(const key of Object.keys(module)){
     if(cachedKeys.includes(key)){
       console.log("Key name", key, "is a duplicate.");

@@ -28,8 +28,6 @@ function initialCheck(){
         }
       }
     });
-  } else if(location.search == "?skip=true"){
-    start();
   } else {
     changeQueryParam();
     const params = {};
@@ -70,7 +68,7 @@ function checkingData() {
 }
 
 const tabData = [
-  {id: "app-list", displayName: "アプリ一覧", isShownInitially: false},
+  {id: "app-selector", displayName: "アプリ一覧", isShownInitially: false},
   {id: "how-to-use", displayName: "使い方", isShownInitially: true},
   {id: "create-app", displayName: "アプリの新規作成", isShownInitially: true},
   {id: "change-user", displayName: "ユーザ変更", isShownInitially: true, isRight: true},

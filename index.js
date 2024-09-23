@@ -61,10 +61,10 @@ isExists(__dirname + "\\node_modules").then((isInstalledNodeModules)=>{
     console.log(path);
   }
   app.post('/', async function(req, res){
-    console.log(req.body.id);
     const filePath = __dirname + "\\html\\templates\\" + req.body.id + ".html";
     if(await isFile(filePath)){
-      res.send(await read(filePath));
+      const content = await read(filePath);
+      res.send("<script>var sentData=%sentData%</script>".replace("%sentData%", JSON.stringify(req.body)) + content);
     } else {
       res.send("<h1 align='center'>未実装機能</h1>");
     }
