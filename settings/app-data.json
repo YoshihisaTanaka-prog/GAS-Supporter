@@ -1,6 +1,1 @@
-{
-  "supportedFileTypes": {
-    "text": ["js", "css", "html", "json"],
-    "image": ["png", "jpg"]
-  }
-}
+{}

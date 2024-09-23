@@ -26,14 +26,6 @@ app.get("/", async function(req, res){
   res.send((await read("html/index.html")).replace("<title></title>", "<title>" + appName + "</title>").replace("%gasUrl%", gasUrl));
 });
 
-
-app.post("/", async function(req, res){
-  console.log("/ post");
-  console.log(req.query);
-  const gasUrl = "https://script.google.com/macros/s/AKfycbwslh0A0p2eQwHFI7m1nPuSbRZnd4goayZyxoVb_p4hAyDuSwFeC2lgBZoxYLRXP87VZw/exec?port=" + server.address().port;
-  res.send((await read("html/index.html")).replace("<title></title>", "<title>" + appName + "</title>").replace("%gasUrl%", gasUrl));
-});
-
 app.get("*", async function(req, res){
   if(await isFile("html" + req.path)){
     res.sendFile(__dirname + "\\html" + req.path.replaceAll("/", "\\"));
