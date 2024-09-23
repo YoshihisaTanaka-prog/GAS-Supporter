@@ -3,7 +3,7 @@
 const { readFile, writeFile, existsSync, lstatSync } = require('fs');
 const { getType, isSameObject } = require('./basic');
 
-module.exports = function (supportedFileTypes){
+module.exports = function (supportedFileTypes=[]){
   if(!isSameObject(supportedFileTypes, supportedFileTypes.toSorted())){
     console.log(supportedFileTypes.toSorted());
   }
@@ -75,6 +75,8 @@ module.exports = function (supportedFileTypes){
               onSuccess();
             }
           });
+        } else {
+          console.error(type, "is not supported in this application");
         }
         break;
     }

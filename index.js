@@ -1,88 +1,124 @@
 "use strict";
 
-const bodyParser       = require("body-parser");
-const express          = require("express");
-const { myOptions }    = require("./basic-modules/basic")
-const Command          = require("./basic-modules/exec")();
-const { read, isFile } = require("./basic-modules/file")([ 'css', 'html', 'js', 'json', 'txt' ]);
-const { userSetting }  = require("./basic-modules/setting");
-const endpoints        = require("./endpoints");
+const { readdirSync }                   = require("fs");
+const { myOptions }                     = require("./basic-modules/basic")
+const Command                           = require("./basic-modules/exec")();
+const { read, isFile, isExists, write } = require("./basic-modules/file")([ 'cmd', 'css', 'html', 'js', 'json', 'txt' ]);
+const { userSetting }                   = require("./basic-modules/setting");
+const endpoints                         = require("./endpoints");
 
 const appName = "GAS-Supporter";
 
-const app = express();
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+// for options ----------------------------------------------------------------------------------------------------------------------------------------------------
 
-const server = app.listen(3001, function(){
-  console.log("Node.js is listening to PORT:" + server.address().port);
-});
-
-// open chrome ----------------------------------------------------------------------------------------------------------------------------------------------------
-
-function openChrome(){
-  setTimeout(() => {
-    Command.set("start chrome.exe http://localhost:" + server.address().port,
-    "open -a 'Google Chrome' 'http://localhost:'" + server.address().port,
-    "echo if you want to visit your web site, open http://localhost:" + server.address().port).runS();
-  }, 500);
-}
-
-if( myOptions.options["-o"] ){
-  openChrome();
-} else if( myOptions.options["--open"] ){
-  openChrome();
-}
-
-// setting post ---------------------------------------------------------------------------------------------------------------------------------------------------
-
-console.log("\n** Endpoints Information **************************\n");
-for(const key of Object.keys(endpoints)){
-  const path = "/" + key.replace(/[A-Z]/g, letter => `-${letter.toLowerCase()}`);
-  app.post(path, endpoints[key]);
-  console.log(path);
-}
-app.post('/', async function(req, res){
-  const filePath = __dirname + "\\html\\templates\\" + req.body.id + ".html";
-  if(await isFile(filePath)){
-    res.send(await read(filePath));
-  } else {
-    res.send("");
+isExists(__dirname + "\\node_modules").then((isInstalledNodeModules)=>{
+  const optionKeys = Object.keys(myOptions.options);
+  if(!isInstalledNodeModules){
+    Command.setAll("npm install --save").runE();
+    // プラットフォームごとに場合分けをする。
+    write(__dirname + "\\gas-supporter.cmd", "@echo off\n\nif not %0==\"%~dp0%~nx0\" (\n  start /min cmd /c \"%~dp0%~nx0\" %*\n  exit\n)\n\ncd " + __dirname + " & node index --open");
+    optionKeys.push("--open");
+    userSetting.set({"isInstalledNodeModules": false});
+    setTimeout(() => {
+      userSetting.set({"isInstalledNodeModules": true});
+    }, 10000);
   }
-});
-console.log("\n/\n** Endpoints Information **************************\n\n");
 
-// setting get ----------------------------------------------------------------------------------------------------------------------------------------------------
+  if(optionKeys.includes("-o") || optionKeys.includes("--open")){
+    setTimeout(() => {
+      Command.set("start chrome.exe http://localhost:" + server.address().port,
+      "open -a 'Google Chrome' 'http://localhost:'" + server.address().port,
+      "echo if you want to visit your web site, open http://localhost:" + server.address().port).runS();
+    }, 1000);
+  }
 
-const getIndexCode = async function(){
-  let htmlCode = await read("html/index.html");
-  htmlCode = htmlCode.replace("<title></title>", "<title>" + appName + "</title>");
-  htmlCode = htmlCode.replace("%port%", server.address().port).replace('"%appData%"', JSON.stringify(userSetting.appData || {}));
-  return htmlCode;
-};
+  // setting default userInfo -----------------------------------------------------------------------------------------------
 
-app.get("/", async function(req, res){
-  if(req.query.folderId){
-    if(req.query.jsonFileId){
-      console.log(req.query);
+  if( userSetting.data.lastOpenedDir == null ){
+    userSetting.set({lastOpenedDir: "C:/Users/" + Command.setAll("whoami").runE()[0].split("\\")[1]})
+  }
+  userSetting.set({creatingAppUid: ""});
+
+  // setting server -------------------------------------------------------------------------------------------------------------------------------------------------
+
+  const bodyParser = require("body-parser");
+  const express    = require("express");
+
+  const app = express();
+  app.use(bodyParser.json());
+  app.use(bodyParser.urlencoded({ extended: true }));
+
+  const server = app.listen(3001, function(){
+    console.log("Node.js is listening to PORT:" + server.address().port);
+  });
+
+  // setting post ---------------------------------------------------------------------------------------------------------------------------------------------------
+
+  console.log("\n** Endpoints Information **************************\n");
+  for(const key of Object.keys(endpoints)){
+    const path = "/" + key.replace(/[A-Z]/g, letter => `-${letter.toLowerCase()}`);
+    app.post(path, endpoints[key]);
+    console.log(path);
+  }
+  app.post('/', async function(req, res){
+    console.log(req.body.id);
+    const filePath = __dirname + "\\html\\templates\\" + req.body.id + ".html";
+    if(await isFile(filePath)){
+      res.send(await read(filePath));
+    } else {
+      res.send("<h1 align='center'>未実装機能</h1>");
     }
-  }
-  const htmlCode = await getIndexCode();
-  res.send(htmlCode);
-});
+  });
+  console.log("/\n\n** Endpoints Information **************************\n\n");
 
-app.get("/index.html", async function(req, res){
-  const htmlCode = await getIndexCode();
-  res.send(htmlCode);
-});
+  // setting get ----------------------------------------------------------------------------------------------------------------------------------------------------
 
-app.get("*", async function(req, res){
-  if(req.path.startsWith("/inner-templates/")){
-    res.send((await read("html/404.html")).replace("<title></title>", "<title>" + appName + "：お探しのページが見つかりません。</title>"));
-  }
-  if(await isFile("html" + req.path)){
-    res.sendFile(__dirname + "\\html" + req.path.replaceAll("/", "\\"));
-  } else {
-    res.send((await read("html/404.html")).replace("<title></title>", "<title>" + appName + "：お探しのページが見つかりません。</title>"));
-  }
+  const getIndexCode = async function(){
+    let htmlCode = await read("html/index.html");
+    htmlCode = htmlCode.replace("<title></title>", "<title>" + appName + "</title>");
+    if(userSetting.data.appData){
+      const appData = userSetting.data.appData;
+      const showData = {};
+      for(const key of Object.keys(appData)){
+        if(![appData[key].folderId, appData[key].jsonFileId].includes("")){
+          showData[key] = {name: appData[key].name, path: appData[key].localPath};
+        }
+      }
+      htmlCode = htmlCode.replace("%port%", server.address().port).replace('"%appData%"', JSON.stringify(showData));
+    } else {
+      userSetting.set({appData: {}});
+      htmlCode = htmlCode.replace("%port%", server.address().port).replace('"%appData%"', "{}");
+    }
+    htmlCode = htmlCode.replace('"%templateOptions%"', JSON.stringify(readdirSync("./gas-templates")));
+    htmlCode = htmlCode.replace('"%isInitialRun%"', JSON.stringify(!userSetting.data.isInstalledNodeModules));
+    return htmlCode;
+  };
+
+  app.get("/", async function(req, res){
+    if(req.query.folderId){
+      if(req.query.jsonFileId){
+        if(req.query.uid){
+          console.log(req.query);
+        }
+      }
+    }
+    const htmlCode = await getIndexCode();
+    res.send(htmlCode);
+  });
+
+  app.get("/index.html", async function(req, res){
+    const htmlCode = await getIndexCode();
+    res.send(htmlCode);
+  });
+
+  app.get("*", async function(req, res){
+    if(req.path.startsWith("/inner-templates/")){
+      res.send((await read("html/404.html")).replace("<title></title>", "<title>" + appName + "：お探しのページが見つかりません。</title>"));
+    }
+    if(await isFile("html" + req.path)){
+      res.sendFile(__dirname + "\\html" + req.path.replaceAll("/", "\\"));
+    } else {
+      res.send((await read("html/404.html")).replace("<title></title>", "<title>" + appName + "：お探しのページが見つかりません。</title>"));
+    }
+  });
 });

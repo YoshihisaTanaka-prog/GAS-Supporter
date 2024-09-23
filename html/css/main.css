@@ -8,6 +8,11 @@ body {
   margin: 0 10vw;
 }
 
+#tab {
+  width: 100vw;
+  display: flex;
+  justify-content: space-between;
+}
 .tab {
   width: 10em;
   border-radius: 0;

@@ -33,11 +33,23 @@ function selectedTab(id){
   }
   switch(id){
     case "change-user":
-      $.post("/change-user", {}, function(data){
-        getLog(data, function(){
-          selectedTab(localStorage.getItem('tabName') || tabData[0].id);
+      if(confirm("claspでログアウトして、再ログインしますか？")){
+        $.post("/change-user", {}, function(data){
+          getLog(data, function(){
+            selectedTab(getLastTabId());
+          });
         });
-      });
+      }
+      break;
+    case "stop":
+      if(confirm("Webアプリを終了しますか？")){
+        $.post("/stop", {}, ()=>{});
+      }
+      break;
+    case "restart":
+      if(confirm("Webアプリの再起動を行いますか？")){
+        $.post("/restart", {}, function(){setTimeout(function(){reloadWindow()}, 1000);});
+      }
       break;
     default:
       $.post("/", {id}, function(data){
@@ -48,4 +60,8 @@ function selectedTab(id){
       });
       break;
   }
+}
+
+function reloadWindow(){
+  window.location.reload();
 }
