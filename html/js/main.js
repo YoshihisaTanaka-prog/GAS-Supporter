@@ -1,38 +1,3 @@
-window.onload = function(){
-  initialCheck();
-}
-
-function initialCheck(){
-  $.post("/initial-check", {}, function(data){
-    let confirmResult = true;
-    if(data.isClaspInstalled){
-      if(data.didLogin){
-        alert("ログインしています。");
-      } else {
-        confirmResult = window.confirm('claspでログインていません。\nログインしますか？\n\nログインしない場合は当システムをご利用いただけません。');
-        if(confirmResult){
-          $.post("/login-to-clasp", {}, (data)=>{
-            getLog(data);
-          });
-        } else{
-          cannotUse();
-        }
-      }
-    } else {
-      confirmResult = window.confirm('必須なnode_moduleのclaspがインストールされていません。\nインストールしますか？\n\nインストールしない場合は当システムをご利用いただけません。');
-      if(confirmResult){
-        $.post("/install-clasp", {}, (data)=>{
-          getLog(data, function(){
-            initialCheck();
-          });
-        });
-      } else{
-        cannotUse();
-      }
-    }
-  });
-}
-
 function getLog(command, afterFunction=()=>{}){
   if(command){
     $.post("/get-running-command-logs", { command }, function(data){
@@ -46,6 +11,7 @@ function getLog(command, afterFunction=()=>{}){
       } else {
         $("#command-output-finished").html("<p><b>タスクが終了しました。</b></p><button id='run-after-function'>OK</button>");
         $('#run-after-function').on("click", function(){
+          $(".command-output").html("");
           afterFunction();
         });
       }
@@ -53,4 +19,33 @@ function getLog(command, afterFunction=()=>{}){
   }
 }
 
-function start(){}
+function selectedTab(id){
+  $(".tab").each(function(){
+    if($(this).attr("id") == (id + "-tab-btn") ){
+      $(this).removeClass("un-selected-tab").addClass("selected-tab");
+    } else{
+      $(this).removeClass("selected-tab").addClass("un-selected-tab");
+    }
+  });
+  if(num){
+    clearInterval(checkingDataIntervalId);
+    delete num;
+  }
+  switch(id){
+    case "change-user":
+      $.post("/change-user", {}, function(data){
+        getLog(data, function(){
+          selectedTab(localStorage.getItem('tabName') || tabData[0].id);
+        });
+      });
+      break;
+    default:
+      $.post("/", {id}, function(data){
+        if(!["create-app"].includes(id)){
+          localStorage.setItem('tabName', id);
+        }
+        $("#main").html(data);
+      });
+      break;
+  }
+}

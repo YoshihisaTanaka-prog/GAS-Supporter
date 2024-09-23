@@ -5,6 +5,7 @@ const express          = require("express");
 const { myOptions }    = require("./basic-modules/basic")
 const Command          = require("./basic-modules/exec")();
 const { read, isFile } = require("./basic-modules/file")([ 'css', 'html', 'js', 'json', 'txt' ]);
+const { userSetting }  = require("./basic-modules/setting");
 const endpoints        = require("./endpoints");
 
 const appName = "GAS-Supporter";
@@ -41,15 +42,22 @@ for(const key of Object.keys(endpoints)){
   app.post(path, endpoints[key]);
   console.log(path);
 }
-console.log("\n** Endpoints Information **************************\n\n");
+app.post('/', async function(req, res){
+  const filePath = __dirname + "\\html\\templates\\" + req.body.id + ".html";
+  if(await isFile(filePath)){
+    res.send(await read(filePath));
+  } else {
+    res.send("");
+  }
+});
+console.log("\n/\n** Endpoints Information **************************\n\n");
 
 // setting get ----------------------------------------------------------------------------------------------------------------------------------------------------
 
 const getIndexCode = async function(){
   let htmlCode = await read("html/index.html");
   htmlCode = htmlCode.replace("<title></title>", "<title>" + appName + "</title>");
-  const gasUrl = "https://script.google.com/macros/s/AKfycbwslh0A0p2eQwHFI7m1nPuSbRZnd4goayZyxoVb_p4hAyDuSwFeC2lgBZoxYLRXP87VZw/exec?port=" + server.address().port;
-  htmlCode = htmlCode.replace("%gasUrl%", gasUrl);
+  htmlCode = htmlCode.replace("%port%", server.address().port).replace('"%appData%"', JSON.stringify(userSetting.appData || {}));
   return htmlCode;
 };
 

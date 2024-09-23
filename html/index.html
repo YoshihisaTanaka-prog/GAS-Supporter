@@ -7,14 +7,18 @@
     <link rel="stylesheet" href="./css/main.css">
     <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
   </head>
-  <script>const gasUrl="%gasUrl%";</script>
+  <script>const port="%port%"; const appData="%appData%"</script>
   <body>
-    <h1 align="center">Test</h1>
+    <div id="tab"></div>
+    <div id="main">
+      <h1 align="center"><span id="checking-data" style="font-size: 1.5em;"></span></h1>
+    </div>
     <div>
       <div id="command-output" class="command-output" style="background-color: #000; color: #0f0;"></div>
       <div id="command-output-finished" class="command-output" style="width: fit-content; text-align: center"></div>
     </div>
-    <button onclick="test()">ドライブを選択</button>
     <script src="/js/main.js"></script>
+    <script src="/js/initialize.js"></script>
+    <script src="/js/window-loaded.js"></script>
   </body>
 </html>

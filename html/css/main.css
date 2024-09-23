@@ -7,3 +7,21 @@ body {
   width: 80vw;
   margin: 0 10vw;
 }
+
+.tab {
+  width: 10em;
+  border-radius: 0;
+  color: #fff;
+}
+.un-selected-tab {
+  background-color: #333;
+}
+.un-selected-tab:hover {
+  background-color: #555;
+}
+.selected-tab {
+  background-color: #555;
+}
+.selected-tab:hover {
+  background-color: #777;
+}

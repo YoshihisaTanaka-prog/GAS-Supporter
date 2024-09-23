@@ -1,7 +1,7 @@
 "use strict";
 
 const Command        = require("../basic-modules/exec")();
-const { isExists }   = require("../basic-modules/file");
+const { isExists }   = require("../basic-modules/file")([]);
 const { runCommand } = require("./run");
 
 const initialCheck = async function(req, res){
