@@ -18,17 +18,16 @@ module.exports = function (fileData){
                 }
                 for(const key in (newObject)){
                   if(oldObject[key]){
-                    self.setUnit(oldObject[key], newObject[key], self);
+                    oldObject[key] = self.setUnit(oldObject[key], newObject[key], self);
                   } else {
                     oldObject[key] = newObject[key];
                   }
                 }
-                return;
+                return oldObject;
               case "function":
                 return ;
               default:
-                oldObject = newObject;
-                return ;
+                return newObject;
             }
           }
           console.error("type error while updating to\n" + JSON.stringify(newObject, null, 2));
@@ -58,7 +57,10 @@ module.exports = function (fileData){
       }
     }
     async set(newData){
-      this.setUnit(this.data, newData);
+      const no = this.setUnit(this.data, newData, this);
+      for(const key of Object.keys(no)){
+        this.data[key] = no[key];
+      }
       return await this.write();
     }
     async sortKey(path="", orderdKeys=[], defaultValue){
