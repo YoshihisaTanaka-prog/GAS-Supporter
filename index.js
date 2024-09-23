@@ -19,11 +19,25 @@ setTimeout(() => {
   "echo if you want to visit your web site, open http://localhost:" + server.address().port).runE();
 }, 500);
 
-app.get("/", async function(req, res){
-  console.log("/ get");
-  console.log(req.query);
+const getIndexCode = async function(){
+  let htmlCode = await read("html/index.html");
+  htmlCode = htmlCode.replace("<title></title>", "<title>" + appName + "</title>");
   const gasUrl = "https://script.google.com/macros/s/AKfycbwslh0A0p2eQwHFI7m1nPuSbRZnd4goayZyxoVb_p4hAyDuSwFeC2lgBZoxYLRXP87VZw/exec?port=" + server.address().port;
-  res.send((await read("html/index.html")).replace("<title></title>", "<title>" + appName + "</title>").replace("%gasUrl%", gasUrl));
+  htmlCode = htmlCode.replace("%gasUrl%", gasUrl);
+  htmlCode = htmlCode.replace("'%isInitialized%'", JSON.stringify(Object.keys(appSetting).includes("isInitialized")));
+  return htmlCode;
+};
+
+app.get("/", async function(req, res){
+  console.log(req.query);
+  const htmlCode = await getIndexCode();
+  res.send(htmlCode);
+});
+
+app.get("/index.html", async function(req, res){
+  console.log(req.query);
+  const htmlCode = await getIndexCode();
+  res.send(htmlCode);
 });
 
 app.get("*", async function(req, res){
