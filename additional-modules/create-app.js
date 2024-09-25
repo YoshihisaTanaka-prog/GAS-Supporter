@@ -1,33 +1,22 @@
 "use strict";
 
-const { mkdir }         = require("fs");
+const { mkdirSync }           = require("fs");
 
-const { getFolderInfo } = require("./get-inner-path");
-const { read, write }   = require("../basic-modules/file")([ 'cmd', 'css', 'html', 'js', 'json', 'txt' ]);
+const { getFolderInfo }       = require("./get-inner-path");
+const { read, write, isFile } = require("../basic-modules/file")([ 'cmd', 'css', 'html', 'js', 'json', 'txt' ]);
 
-const createAppFolder = async function(path, uid, option){
+const copyAppFolder = async function(path, uid, option){
   const folderInfo = await getFolderInfo("./gas-templates/" + option);
-  await new Promise((resolve, reject) => {
-    mkdir(path + "/edit", (err)=>{
-      if(err){
-        return resolve(err.message);
-      } else{
-        return resolve("");
-      }
-    })
-  })
+  if(await isFile(path + "/edit") == false){
+    mkdirSync(path + "/edit");
+    mkdirSync(path + "/out");
+  }
   for(const childPath of folderInfo){
     const writePath = path + "/edit/" + childPath;
     if(childPath.endsWith("/")){
-      await new Promise((resolve, reject) => {
-        mkdir(writePath.slice(0,-1), (err)=>{
-          if(err){
-            return resolve(err.message);
-          } else{
-            return resolve("");
-          }
-        })
-      })
+      if(await isFile(writePath.slice(0,-1)) == false){
+        mkdirSync(writePath.slice(0,-1));
+      }
     } else{
       const content = await read("./gas-templates/" + option + "/" + childPath);
       await write(writePath, content);
@@ -36,4 +25,4 @@ const createAppFolder = async function(path, uid, option){
   return folderInfo.filter( (path) => !path.endsWith("/") );
 }
 
-module.exports = { createAppFolder }
+module.exports = { copyAppFolder }

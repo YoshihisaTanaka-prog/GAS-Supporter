@@ -1,22 +1,83 @@
 body {
   padding: 0;
   margin: 0;
+  height: 100vh;
+  width: 100vw;
+}
+::-webkit-scrollbar {
+  height: 0.5rem;
+  width: 0.5rem;
+}
+::-webkit-scrollbar-thumb {
+  background-color: #666;
+  height: 0.5rem;
+  width: 0.5rem;
+  border-radius: 0.25rem;
+}
+header {
+  width: 100vw;
+}
+.center-form {
+  border-radius: 2em;
+  padding: 5em;
+  margin-top: 10vh;
+  margin-left: 30vw;
+  margin-right: 30vw;
+  border: 1px solid #000;
+}
+.main-scroll-x {
+  overflow-x: scroll;
+}
+.main-scroll-y {
+  overflow-y: scroll;
 }
 
+/* ストリーム形式でコマンドを出力する機能 */
+.command-output-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: none;
+  z-index: 100;
+  padding-top: 10vh;
+}
 .command-output {
   width: 80vw;
   margin: 0 10vw;
 }
+.command-output::before {
+  content: "test";
+}
 
+/* メニュータブを表示する機能 */
 #tab {
   width: 100vw;
   display: flex;
   justify-content: space-between;
 }
+.tab-div {
+  white-space: nowrap;
+  z-index: 99;
+  display: inline-block;
+}
+.tab-div::-webkit-scrollbar {
+  border-right: 1px solid #000;
+}
+#tab-right {
+  margin-left: 1em;
+}
+#tab-right::-webkit-scrollbar {
+  border-right: none;
+  border-left: 1px solid #000;
+}
 .tab {
   width: 10em;
   border-radius: 0;
   color: #fff;
+  box-sizing: border-box;
 }
 .un-selected-tab {
   background-color: #333;
@@ -31,6 +92,7 @@ body {
   background-color: #777;
 }
 
+/* アプリ選択関連 */
 #app-selector {
   list-style: none;
   padding-inline-start: 10px;
@@ -85,4 +147,16 @@ body {
 .app-li-btn-path {
   display: inline-block;
   text-align: left;
+}
+
+/* 新規アプリ作成関連 */
+#create-app-form-option {
+  display: flex;
+  overflow-x: scroll;
+}
+#create-app-form-option div p {
+  margin-right: 1em;
+}
+#create-app-form-option div p span {
+  white-space: nowrap;
 }

@@ -1,23 +1,29 @@
 <h1 align="center">新規作成</h1>
 
-<form style="border-radius: 2em; padding: 5em; margin-top: 10vh; margin-left: 30vw; margin-right: 30vw; border: 1px solid #000;">
+<form class="center-form" id="create-app-form">
   <div>
     <b>アプリ名を入力してください。</b>
     <p align="center"><input type="text" id="create-app-form-name"></p>
   </div>
   <div>
     <b>保存するフォルダの場所を指定してください。</b><br>
-    ※　指定したフォルダ内に編集用の「edit」フォルダとアップロード用の「out」フォルダが作成されます。　※
+    <div align="left" style="width: fit-content; font-size: 0.8em;">
+      ※※※※※※※※※※※※※※※※※<br>
+      指定したフォルダ内に<br>
+      ・編集用の「edit」フォルダ<br>
+      ・アップロード用の「out」フォルダ<br>
+      以上が作成されます。<br>
+      ※※※※※※※※※※※※※※※※※
+    </div>
     <p align="center">
       <button type="button" onclick="selectFolder()">フォルダを選択</button>
       <input type="text" id="create-app-form-path">
     </p>
   </div>
   <div>
-    <b>オプションを選択してください。</b>
-    <p align="center">
-      <select id="create-app-form-option"></select>
-    </p>
+    <b>オプション選択：</b>
+    <div id="create-app-form-option">
+    </div>
   </div>
   <p align="center"><button type="button" onclick="sendNewAppInfo();">決定</button></p>
 </form>

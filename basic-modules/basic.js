@@ -119,7 +119,7 @@ const isSameObject = function(object1, object2, ignoreArrayOrder=false){
 
 const getUid = function(usedUidList=[], length=10){
   function sub(){
-    const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz123456789";
+    const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890";
     let uid = letters[Math.floor(Math.random() * 52)];
     for(let i=1; i<length; i++){
       uid += letters[Math.floor(Math.random() * 62)];

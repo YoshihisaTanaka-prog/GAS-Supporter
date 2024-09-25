@@ -5,7 +5,6 @@ function showAppDetail(appId){
       array.push(key);
     }
   }
-  console.log(array);
   $.post("/sort-app-order", {order: array}, function(data){
     appData = data;
   });

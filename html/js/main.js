@@ -1,4 +1,73 @@
+const scrollStatus = {};
+
+function setHorizontalScroll() {
+  for(const pos of ["left", "middle", "right"]){
+    addHorizontalScroll("tab-" + pos);
+  }
+}
+
+function addHorizontalScroll(id){
+  $("#" + id).hover(
+    function(){
+      scrollStatus[id] = true;
+    }, function(){
+      scrollStatus[id] = false;
+    }
+  );
+}
+function removeHorizontalScroll(){
+  for(const key of Object.keys(scrollStatus)){
+    if(!key.startsWith("tab-")){
+      $("#" + key).unbind('mouseenter').unbind('mouseleave')
+      delete scrollStatus[key];
+    }
+  }
+}
+
+let defaultTabHeight = 0;
+
+function setLength() {
+  $(".tab-div").attr("style", "");
+  $("#main").attr("style", "");
+  if(defaultTabHeight == 0){
+    defaultTabHeight = $("#tab-left").height();
+  }
+  let isNeedTabScroll = false;
+  const windowWidth = $(window).width();
+  const rightWidth = $("#tab-right").width();
+  if(windowWidth*0.4 < rightWidth){
+    $("#tab-right").width(windowWidth*0.4).css("overflow-x", "scroll");
+    isNeedTabScroll = true;
+  }
+  const restWidth = windowWidth - $("#tab-right").width();
+  const leftWidth = $("#tab-left").width();
+  const middleWidth = $("#tab-middle").width();
+  if(leftWidth + middleWidth > restWidth){
+    $("#tab-left").attr("style", "width: " + restWidth*0.7 + "px; overflow-x: scroll;");
+    $("#tab-middle").width(restWidth*0.3).attr("style", "width: " + restWidth*0.4 + "px; overflow-x: scroll;");
+    isNeedTabScroll = true;
+  }
+  const remSize = $("#for-get-rem-size").height();
+  const tabHeight = isNeedTabScroll ? defaultTabHeight + remSize/2 : defaultTabHeight;
+  $(".tab-div").height(tabHeight);
+  let scrollBarWidth = 0;
+  const windowHeight = $(window).height();
+  const maxMainHeight = windowHeight - tabHeight;
+  const mainHeight = $("#main").height();
+  let mainStyleCode = "";
+  if(mainHeight > maxMainHeight){
+    mainStyleCode += "height:" + maxMainHeight + "px;overflow-y:scroll;";
+    scrollBarWidth = remSize*0.5
+  }
+  const mainWidth = $("#main").width();
+  if(mainWidth > windowWidth - scrollBarWidth){
+    mainStyleCode += "width:" + (windowWidth - scrollBarWidth) + "px;overflow-x:scroll;";
+  }
+  $("#main").attr("style", mainStyleCode);
+}
+
 function getLog(command, afterFunction=()=>{}){
+  $(".command-output-background").css("display", "block");
   if(command){
     $.post("/get-running-command-logs", { command }, function(data){
       console.log();
@@ -11,6 +80,7 @@ function getLog(command, afterFunction=()=>{}){
       } else {
         $("#command-output-finished").html("<p><b>タスクが終了しました。</b></p><button id='run-after-function'>OK</button>");
         $('#run-after-function').on("click", function(){
+          $(".command-output-background").css("display", "none");
           $(".command-output").html("");
           afterFunction();
         });
@@ -20,9 +90,12 @@ function getLog(command, afterFunction=()=>{}){
 }
 
 function selectedTab(id){
-  if(id != "app-detail"){
-    localStorage.setItem("selectedAppId", "");
+  removeHorizontalScroll();
+  if(id == "app-detail"){
+    setLength();
+  } else{
     $("#app-detail-tab-btn").css("display", "none");
+    setLength();
   }
   $(".tab").each(function(){
     if($(this).attr("id") == (id + "-tab-btn") ){
@@ -36,6 +109,12 @@ function selectedTab(id){
     delete num;
   }
   switch(id){
+    case "reload":
+      $("#main").html("<h1 align='center'>リロード中</h1>");
+      setTimeout(function(){
+        $('#reload-form').submit();
+      }, 500);
+      break;
     case "change-user":
       if(confirm("claspでログアウトして、再ログインしますか？")){
         $.post("/change-user", {}, function(data){
@@ -52,22 +131,25 @@ function selectedTab(id){
       break;
     case "restart":
       if(confirm("Webアプリの再起動を行いますか？")){
-        $.post("/restart", {}, function(){setTimeout(function(){reloadWindow()}, 1000);});
+        $.post("/restart", {}, function(){setTimeout(function(){
+          $('#reload-form').submit();
+        }, 1000);});
       }
       break;
     default:
+      if(!["app-detail", "create-app"].includes(id)){
+        localStorage.setItem("selectedAppId", "");
+      }
       $.post("/", {id}, function(data){
         if(!["create-app"].includes(id)){
           localStorage.setItem('tabName', id);
         }
         $("#main").html(data);
         $(".tab-script").remove();
-        $("body").append("<script src='/js/" + id + ".js' class='tab-script'></script>");
+        if(["app-detail", "app-selector", "create-app"].includes(id)){
+          $("body").append("<script src='/js/" + id + ".js' class='tab-script'></script>");
+        }
       });
       break;
   }
-}
-
-function reloadWindow(){
-  window.location.reload();
 }

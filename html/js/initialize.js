@@ -1,5 +1,7 @@
 function initialCheck(){
-  if(location.search == ""){
+  if(isSkipChecking){
+    start();
+  } else if(location.search == ""){
     $.post("/initial-check", {}, function(data){
       let confirmResult = true;
       if(data.isClaspInstalled){
@@ -29,7 +31,6 @@ function initialCheck(){
       }
     });
   } else {
-    changeQueryParam();
     const params = {};
     for(const unit of location.search.slice(1).split("&")){
       const [key, value] = unit.split("=");
@@ -37,9 +38,12 @@ function initialCheck(){
     }
     $.post("/setup-new-app", params, (data)=>{
       if(data){
+        localStorage.setItem("selectedAppId", data)
+        $("#main").html("");
+        $("#reload-form").submit();
       } else{
-        selectedTab("create-app");
         alert("予期せぬエラーが発生しました。アプリを再度作り直してください。");
+        start("create-app");
       }
     });
   }
@@ -73,12 +77,14 @@ const tabData = [
   {id: "how-to-use", displayName: "使い方", isShownInitially: true},
   {id: "create-app", displayName: "アプリの新規作成", isShownInitially: true},
   {id: "change-user", displayName: "ユーザ変更", isShownInitially: true, isRight: true},
-  {id: "restart", displayName: "再起動", isShownInitially: true, isHalf: true, isRight: true, isNeedMargin: true},
+  {id: "reload", displayName: "リロード", isShownInitially: true, isHalf: true, isRight: true},
+  {id: "restart", displayName: "再起動", isShownInitially: true, isHalf: true, isRight: true},
   {id: "stop", displayName: "終了", isShownInitially: true, isHalf: true, isRight: true},
 ];
 
-function start(){
+function start(id=""){
   $("#tab-left").html("");
+  $("#tab-middle").html("");
   $("#tab-right").html("");
   $("#main").html("");
   for(const unit of tabData){
@@ -86,11 +92,13 @@ function start(){
       if(isInitialRun){
         $("#tab-left").append('<button class="tab" id="' + unit.id + '-tab-btn">' + unit.displayName + '</button>');
       } else{
-        $("#tab-right").append('<button class="tab" id="' + unit.id + '-tab-btn">' + unit.displayName + '</button>');
-        $("#" + unit.id + "-tab-btn").css("width", "5em");
+        $("#tab-middle").append('<button class="tab" id="' + unit.id + '-tab-btn">' + unit.displayName + '</button>');
+        $("#" + unit.id + "-tab-btn").css("width", "6em");
       }
-    } else if(unit.isRight){
+    } else if(["reload", "restart", "stop"].includes(unit.id)) {
       $("#tab-right").append('<button class="tab" id="' + unit.id + '-tab-btn">' + unit.displayName + '</button>');
+    } else if(unit.isRight){
+      $("#tab-middle").append('<button class="tab" id="' + unit.id + '-tab-btn">' + unit.displayName + '</button>');
     } else{
       $("#tab-left").append('<button class="tab" id="' + unit.id + '-tab-btn">' + unit.displayName + '</button>');
     }
@@ -98,10 +106,7 @@ function start(){
       selectedTab(unit.id);
     });
     if(unit.isHalf){
-      $("#" + unit.id + "-tab-btn").css("width", "5em");
-    }
-    if(unit.isNeedMargin){
-      $("#" + unit.id + "-tab-btn").css("margin-left", "2em");
+      $("#" + unit.id + "-tab-btn").css("width", "6em");
     }
     if(!unit.isShownInitially && Object.keys(appData).length == 0){
       $("#" + unit.id + "-tab-btn").css("display", "none");
@@ -109,7 +114,12 @@ function start(){
   }
   $("#app-detail-tab-btn").css("display", "none").css("width", "fit-content");
   $("#stop-tab-btn").css("background-color", "#f00");
-  selectedTab(localStorage.getItem('tabName') || getLastTabId());
+  setLength();
+  if(id == ""){
+    selectedTab(localStorage.getItem('tabName') || getLastTabId());
+  } else {
+    selectedTab(id);
+  }
 }
 
 function getLastTabId(){

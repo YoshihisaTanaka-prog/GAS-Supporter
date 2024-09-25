@@ -61,28 +61,32 @@ isExists(__dirname + "\\node_modules").then((isInstalledNodeModules)=>{
     console.log(path);
   }
   app.post('/', async function(req, res){
-    const filePath = __dirname + "\\html\\templates\\" + req.body.id + ".html";
-    if(await isFile(filePath)){
-      res.send(await read(filePath));
+    if(req.body.id){
+      const filePath = __dirname + "\\html\\templates\\" + req.body.id + ".html";
+      if(await isFile(filePath)){
+        res.send(await read(filePath));
+      } else {
+        res.send("<h1 align='center'>未実装機能</h1>");
+      }
     } else {
-      res.send("<h1 align='center'>未実装機能</h1>");
+      res.send(await getIndexCode(true));
     }
   });
   console.log("/\n\n** Endpoints Information **************************\n\n");
 
   // setting get ----------------------------------------------------------------------------------------------------------------------------------------------------
 
-  const getIndexCode = async function(){
+  const getIndexCode = async function(isSkipChecking=false){
     let htmlCode = await read("html/index.html");
     htmlCode = htmlCode.replace("<title></title>", "<title>" + appName + "</title>");
     if(userSetting.data.appData){
       const appData = userSetting.data.appData;
       const showData = {};
       for(const key of Object.keys(appData)){
-        if([appData[key].folderId, appData[key].jsonFileId].includes("")){
+        if([appData[key].folderId, appData[key].jsonFileId].includes("") && userSetting.data.creatingAppUid == ""){
           delete userSetting.data.appData[key];
         } else{
-          showData[key] = {name: appData[key].name, path: appData[key].localPath};
+          showData[key] = {name: appData[key].name, path: appData[key].localRootPath};
         }
       }
       await userSetting.set({});
@@ -91,19 +95,12 @@ isExists(__dirname + "\\node_modules").then((isInstalledNodeModules)=>{
       userSetting.set({appData: {}});
       htmlCode = htmlCode.replace("%port%", server.address().port).replace('"%appData%"', "{}");
     }
-    htmlCode = htmlCode.replace('"%templateOptions%"', JSON.stringify(readdirSync("./gas-templates")));
     htmlCode = htmlCode.replace('"%isInitialRun%"', JSON.stringify(!userSetting.data.isInstalledNodeModules));
+    htmlCode = htmlCode.replace('"%isSkipChecking%"', JSON.stringify(isSkipChecking));
     return htmlCode;
   };
 
   app.get("/", async function(req, res){
-    if(req.query.folderId){
-      if(req.query.jsonFileId){
-        if(req.query.uid){
-          console.log(req.query);
-        }
-      }
-    }
     const htmlCode = await getIndexCode();
     res.send(htmlCode);
   });
