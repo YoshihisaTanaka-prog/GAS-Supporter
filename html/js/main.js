@@ -20,6 +20,10 @@ function getLog(command, afterFunction=()=>{}){
 }
 
 function selectedTab(id){
+  if(id != "app-detail"){
+    localStorage.setItem("selectedAppId", "");
+    $("#app-detail-tab-btn").css("display", "none");
+  }
   $(".tab").each(function(){
     if($(this).attr("id") == (id + "-tab-btn") ){
       $(this).removeClass("un-selected-tab").addClass("selected-tab");

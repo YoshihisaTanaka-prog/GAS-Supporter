@@ -31,12 +31,58 @@ body {
   background-color: #777;
 }
 
-.app-li::marker:hover {
-  background-color: #aaa;
+#app-selector {
+  list-style: none;
+  padding-inline-start: 10px;
+  width: fit-content;
+  border: 1px solid #000;
+  border-radius: 5px;
+  margin: 1em;
+  padding: 1em;
 }
-.app-li-span {
-  background-color: #fff;
+.app-li {
+  width: fit-content;
+  height: fit-content;
+  margin-bottom: 1px;
+  margin-top: 0;
 }
-.app-li-span:hover {
-  background-color: #ffa;
+.app-li::before {
+  content: "↕";
+  display:  inline-block;
+  padding-right: 10px;
+  padding-left: 10px;
+  font-weight: 700;
+  font-size: 1.5em;
+  border-radius: 5px;
+  margin-right: 5px;
+}
+.app-li-sortable:hover::before {
+  background-color: #ddd;
+}
+.app-li-add {
+  text-align: center;
+}
+.app-li-add button {
+  width: 10em;
+}
+.app-li-btn {
+  border-radius: 0;
+  color: #fff;
+  background-color: #333;
+}
+.app-li-sortable-btn {
+  justify-content: space-between;
+}
+.app-li-btn:hover {
+  background-color: #555;
+}
+.app-li-btn-name {
+  display: inline-block;
+  font-weight: 700;
+  text-align: left;
+  font-size: 1.5em;
+}
+.app-li-btn-path {
+  display: inline-block;
+  text-align: left;
 }

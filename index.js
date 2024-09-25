@@ -63,8 +63,7 @@ isExists(__dirname + "\\node_modules").then((isInstalledNodeModules)=>{
   app.post('/', async function(req, res){
     const filePath = __dirname + "\\html\\templates\\" + req.body.id + ".html";
     if(await isFile(filePath)){
-      const content = await read(filePath);
-      res.send("<script>var sentData=%sentData%</script>".replace("%sentData%", JSON.stringify(req.body)) + content);
+      res.send(await read(filePath));
     } else {
       res.send("<h1 align='center'>未実装機能</h1>");
     }
@@ -80,10 +79,13 @@ isExists(__dirname + "\\node_modules").then((isInstalledNodeModules)=>{
       const appData = userSetting.data.appData;
       const showData = {};
       for(const key of Object.keys(appData)){
-        if(![appData[key].folderId, appData[key].jsonFileId].includes("")){
+        if([appData[key].folderId, appData[key].jsonFileId].includes("")){
+          delete userSetting.data.appData[key];
+        } else{
           showData[key] = {name: appData[key].name, path: appData[key].localPath};
         }
       }
+      await userSetting.set({});
       htmlCode = htmlCode.replace("%port%", server.address().port).replace('"%appData%"', JSON.stringify(showData));
     } else {
       userSetting.set({appData: {}});

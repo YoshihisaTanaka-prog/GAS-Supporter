@@ -2,9 +2,14 @@
 
 const { userSetting } = require("../basic-modules/setting");
 
-const sortAppOrder = function(req, res){
-  userSetting.sortKey("appData", req.body.order);
-  res.send("");
+const sortAppOrder = async function(req, res){
+  const appData = userSetting.data.appData;
+  const showData = {};
+  for(const key of req.body.order){
+    showData[key] = {name: appData[key].name, path: appData[key].localPath};
+  }
+  res.send(showData);
+  await userSetting.sortKey("appData", req.body.order);
 };
 
 module.exports ={ sortAppOrder };

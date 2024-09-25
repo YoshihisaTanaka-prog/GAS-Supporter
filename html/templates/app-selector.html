@@ -1,1 +1,12 @@
-<ul id="app-selector"></ul>
+<ul id="app-selector">
+  <li>
+    <b>あなたのアプリ一覧</b>
+    <p>
+      <input id="search-app-name" oninput="searchApp()" placeholder="アプリを探す">
+    </p>
+  </li>
+  <li class="app-li-add">
+    <p><button class="app-li-btn" onclick="selectedTab('create-app')">アプリの新規作成</button></p>
+  </li>
+  <hr>
+</ul>

@@ -69,6 +69,7 @@ function checkingData() {
 
 const tabData = [
   {id: "app-selector", displayName: "アプリ一覧", isShownInitially: false},
+  {id: "app-detail", displayName: "", isShownInitially: true},
   {id: "how-to-use", displayName: "使い方", isShownInitially: true},
   {id: "create-app", displayName: "アプリの新規作成", isShownInitially: true},
   {id: "change-user", displayName: "ユーザ変更", isShownInitially: true, isRight: true},
@@ -106,6 +107,7 @@ function start(){
       $("#" + unit.id + "-tab-btn").css("display", "none");
     }
   }
+  $("#app-detail-tab-btn").css("display", "none").css("width", "fit-content");
   $("#stop-tab-btn").css("background-color", "#f00");
   selectedTab(localStorage.getItem('tabName') || getLastTabId());
 }
