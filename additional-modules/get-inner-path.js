@@ -32,4 +32,17 @@ const getFolderInfo = async function(path=""){
   return formattedFolderInfo;
 }
 
-module.exports = { getFolderInfo };
+const getFirstLevelFolderInfo = async function(path=""){
+  const files = fs.readdirSync(path);
+  const innerFolders = [];
+  for(const file of files){
+    if(await isFile(path + "/" + file) == false){
+      const files = fs.readdirSync(path + "/" + file);
+      innerFolders.push({name: file, numOfContents: files.length});
+    }
+  }
+  return {numOfContents: files.length, innerFolders: innerFolders};
+}
+
+
+module.exports = { getFolderInfo, getFirstLevelFolderInfo };

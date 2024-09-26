@@ -1,10 +1,11 @@
 "use strict";
 
-const fs                        = require("fs");
-const { getUid }                = require("../basic-modules/basic");
-const { isFile }                = require("../basic-modules/file")();
-const { userSetting }           = require("../basic-modules/setting");
-const { copyAppFolder }         = require("../additional-modules/create-app");
+const fs                                         = require("fs");
+const { copyAppFolder, initialClaspSetup }       = require("../additional-modules/create-app");
+const { getFolderInfo, getFirstLevelFolderInfo } = require("../additional-modules/get-inner-path");
+const { getUid }                                 = require("../basic-modules/basic");
+const { isFile }                                 = require("../basic-modules/file")();
+const { userSetting }                            = require("../basic-modules/setting");
 
 async function createApp(req, res){
   switch(await isFile(req.body.path)){
@@ -41,11 +42,19 @@ const setupNewApp = async function(req, res){
   if(newAppUid == ""){
     res.send(false);
   } else{
-    const newAppPath = userSetting.data.appData[newAppUid].localRootPath;
     const newObject = {};
-    newObject[newAppUid] = {mainFolderId: req.body.mainFolderId, dbFolderId: req.body.dbFolderId, jsonFileId: req.body.jsonFileId, fileInfo: await copyAppFolder(newAppPath, newAppUid, "basic")};
+    const newAppData = userSetting.data.appData[newAppUid];
+    const path = newAppData.localRootPath;
+    if(!newAppData.option.templates.includes("basic")){
+      await copyAppFolder(path, "basic");
+    }
+    for(const template of newAppData.option.templates){
+      await copyAppFolder(path, template);
+    }
+    newObject[newAppUid] = {mainFolderId: req.body.mainFolderId, dbFolderId: req.body.dbFolderId, jsonFileId: req.body.jsonFileId, fileInfo: await getFolderInfo(path + "/edit")};
     userSetting.set({appData: newObject, creatingAppUid: ""});
     res.send(newAppUid);
+    initialClaspSetup(newAppUid);
   }
 }
 
