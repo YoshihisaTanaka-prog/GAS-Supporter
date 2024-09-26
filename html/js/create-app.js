@@ -1,4 +1,5 @@
-const createAppOptionKeyAndTitles = [];
+var createAppOptionKeyAndTitles = [];
+var currentFolders = [];
 $.post("/get-create-app-options", {}, function(data){
   const havingDefaultOptionKeys = ["templates"];
   for(const key of Object.keys(data)){
@@ -74,12 +75,147 @@ function sendNewAppInfo(){
 }
 
 function selectFolder(path=""){
+  $("#folder-popup-background").css("display", "block");
   $.post("/search-path-of-app", {path}, function(data){
     console.log(data);
+    setFolderInfo(data);
   });
 }
 
-function selectedFolder(path=""){}
+function setFolderInfo(data, isCheckIfRootFolder=true){
+  currentFolders = [];
+  let openParentCode = "";
+  if(isCheckIfRootFolder){
+    switch (data.platform) {
+      case "win32":
+        if(data.myPath.length > 2){
+          openParentCode = `<button onclick="selectFolder('${data.myPath.split("/").slice(0,-1).join("/")}')">親フォルダを開く</button>`;
+        }
+        break;
+      case "darwin":
+        if(data.myPath != "/"){
+          openParentCode = `<button onclick="selectFolder('${data.myPath.split("/").slice(0,-1).join("/")}')">親フォルダを開く</button>`;
+        }
+        break;
+      case "linux":
+        if(data.myPath != "/"){
+          openParentCode = `<button onclick="selectFolder('${data.myPath.split("/").slice(0,-1).join("/")}')">親フォルダを開く</button>`;
+        }
+        break;
+      default:
+        break;
+    }
+  } else{
+    openParentCode = `<button onclick="selectFolder('${data.myPath.split("/").slice(0,-1).join("/")}')">親フォルダを開く</button>`;
+  }
+  $("#popup-content").html("<div id='folder-popup-tab'><div><span><b>" + data.myPath + "/</b><input type='text' id='folder-popup-search'></span></div><div><p>" + openParentCode + "<button id='folder-popup-tab-create-new-folder'>新規フォルダーを作成</button></p><p align='right'><button onclick='closeFolderSelectPopup()'>閉じる</button></p></div></div>");
+  $('#folder-popup-tab-create-new-folder').on('click', function(){
+    openNewFolderNameForm();
+  });
+  $('#folder-popup-search').on("input", function(){
+    const searchWord = $('#folder-popup-search').val();
+    if(searchWord == ""){
+      $(".select-folder-li").css("display", "list-item")
+    } else{
+      $(".select-folder-li").each(function(){
+        if($(this).find(".select-folder-li-text").eq(0).text().includes(searchWord)){
+          $(this).css("display", "list-item")
+        } else {
+          $(this).css("display", "none")
+        }
+      });
+    }
+  });
+  $("#popup-content").append("<div id='folder-popup-main'><ul id='select-folder-ul'></ul></div>");
+  for (const unit of data.innerFolders){
+    $("#select-folder-ul").append(`<li class="select-folder-li"><button class="select-folder-li-main-button" onclick="selectFolder('${data.myPath}/${unit.name}')"><div class="select-folder-li-text">${unit.name}</div>${unit.numOfContents == 0 ? '<div class="select-folder-li-sub-button" onclick="selectedFolder(\'' + data.myPath + "/" + unit.name + '\')">選択</div>' : '<div class="select-folder-li-sub-button"></div>'}</button></li>`);
+    currentFolders.push(unit.name);
+  }
+  $("#select-folder-ul").append("<li class='select-folder-li-file' style='border: none; padding-left: 0'><hr style='margin: 5px 0;'></li>");
+  for(const file of data.innerFiles){
+    $("#select-folder-ul").append("<li class='select-folder-li-file'>" + file + "</li>");
+  }
+  $(".select-folder-li-sub-button").css("width", remSize*3);
+  let folderMaxWidth = 0;
+  $(".select-folder-li-text").each(function(){
+    const thisWidth = $(this).width();
+    if(thisWidth > folderMaxWidth){
+      folderMaxWidth = thisWidth;
+    }
+  });
+  let fileMaxWidth = 0;
+  $(".select-folder-li-file").each(function(){
+    const thisWidth = $(this).width();
+    if(thisWidth > fileMaxWidth){
+      fileMaxWidth = thisWidth;
+    }
+  });
+  $(".select-folder-li-file").width(fileMaxWidth);
+  $(".select-folder-li-text").width(folderMaxWidth);
+  $(".select-folder-li-main-button").width(folderMaxWidth + remSize*3.5);
+  const folderWidth = $(".select-folder-li-main-button").eq(0).outerWidth();
+  const fileWidth = $(".select-folder-li-file").eq(0).width();
+  if(folderWidth > fileWidth){
+    $(".select-folder-li-file").each(function(){
+      $(this).width(folderWidth - Number($(this).css("padding-left").slice(0,-2)));
+    });
+  } else{
+    $(".select-folder-li-main-button").width(fileWidth);
+  }
+  const currentUlHeight = $("#select-folder-ul").height();
+  const ulHeight = $("#popup-content").height() - Number($("#popup-content").css("padding").slice(0,-2)) - $("#folder-popup-tab").height();
+  $("#select-folder-ul").height(ulHeight);
+  if(currentUlHeight > ulHeight){
+    $("#select-folder-ul").css("overflow-y", "scroll").css("height", ulHeight + "px");
+  } else{
+    $("#select-folder-ul").height(ulHeight);
+  }
+}
+var currentHtmlCode = "";
+function openNewFolderNameForm(){
+  currentHtmlCode = $("#popup-content").html();
+  $("#popup-content").html('<form style="width: 50vw; margin-left: auto; margin-right: auto; margin-top: 10vh; text-align: center;"><p><input type="text" id="select-folder-new-name"></p><p><button type="button" onclick="createNewFolder()">決定</button>　<button type="button" onclick="closeNewFolderNameForm()">閉じる</button></p></form>');
+}
+function createNewFolder(){
+  const newFolderName = $("#select-folder-new-name").val();
+  if(["", null, undefined].includes(newFolderName)){
+    alert("フォルダ名を入力してください。");
+  } else {
+    const usedWrongLetters = [];
+    for(const char of newFolderName){
+      if("\\/:*?\"><| ".includes(char) && !usedWrongLetters.includes(char)){
+        usedWrongLetters.push(char);
+      }
+    }
+    if(usedWrongLetters.length == 0){
+      $.post("/create-new-folder", {name: newFolderName}, function(data){
+        if(data){
+          setFolderInfo({myPath: data, numOfContents: 0, innerFolders: [], innerFiles: []}, false);
+        } else {
+          alert("同名のファイルまたはフォルダが存在します。別の名前のフォルダを作ってください。");
+        }
+      });
+    } else {
+      alert(usedWrongLetters.map( (l) => l == " " ? "「半角スペース」" : `「${l}」` ).join("、") + "はフォルダ名に含めないでください。");
+    }
+  }
+}
+function closeNewFolderNameForm(){
+  $("#popup-content").html(currentHtmlCode);
+}
+
+function closeFolderSelectPopup(){
+  $("#popup-content").html("");
+  $("#folder-popup-background").removeAttr("style");
+}
+
+function selectedFolder(path=""){
+  setTimeout(() => {
+    $("#create-app-form-select-folder-btn").text("選択完了");
+    closeFolderSelectPopup();
+    $("#create-app-form-path").val(path);
+  }, 50);
+}
 
 function confirmToOpenGas(){
   const result = confirm('外部サイト(GAS)を利用してあなたのGASを保存するフォルダを決めますか？')

@@ -31,6 +31,7 @@ function initialCheck(){
       }
     });
   } else {
+    checkingDataText = "Setting up your new application";
     const params = {};
     for(const unit of location.search.slice(1).split("&")){
       const [key, value] = unit.split("=");
@@ -38,7 +39,8 @@ function initialCheck(){
     }
     $.post("/setup-new-app", params, (data)=>{
       if(data){
-        localStorage.setItem("selectedAppId", data)
+        localStorage.setItem("selectedAppId", data);
+        localStorage.setItem('tabName', "app-detail");
         $("#main").html("");
         $("#reload-form").submit();
       } else{
@@ -54,16 +56,18 @@ const checkingDataIntervalId = setInterval(() => {
   checkingData();
 }, 500);
 
+let checkingDataText = "Checking Data";
+
 function checkingData() {
   switch (num % 3) {
     case 0:
-      $("#checking-data").html("Checking Data.&nbsp;&nbsp;&nbsp;");
+      $("#checking-data").html(checkingDataText + ".&nbsp;&nbsp;&nbsp;");
       break;
     case 1:
-      $("#checking-data").html("Checking Data..&nbsp;&nbsp;");
+      $("#checking-data").html(checkingDataText + "..&nbsp;&nbsp;");
       break;
     case 2:
-      $("#checking-data").html("Checking Data...&nbsp;");
+      $("#checking-data").html(checkingDataText + "...&nbsp;");
       break;
     default:
       break;

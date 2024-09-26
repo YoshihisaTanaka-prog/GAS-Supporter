@@ -31,9 +31,15 @@ header {
 .main-scroll-y {
   overflow-y: scroll;
 }
-
-/* ストリーム形式でコマンドを出力する機能 */
-.command-output-background {
+button {
+  border-radius: 0;
+  color: #fff;
+  background-color: #333;
+}
+button:hover {
+  background-color: #555;
+}
+.popup-background {
   position: fixed;
   top: 0;
   left: 0;
@@ -42,14 +48,21 @@ header {
   background-color: rgba(0, 0, 0, 0.5);
   display: none;
   z-index: 100;
+}
+.popup-background div {
+  background-color: #fff;
+  border-radius: 2em;
+  padding: 2.5em;
+}
+
+/* ストリーム形式でコマンドを出力する機能 */
+#command-output-background {
   padding-top: 10vh;
 }
 .command-output {
   width: 80vw;
   margin: 0 10vw;
-}
-.command-output::before {
-  content: "test";
+  border-radius: 0;
 }
 
 /* メニュータブを表示する機能 */
@@ -75,15 +88,7 @@ header {
 }
 .tab {
   width: 10em;
-  border-radius: 0;
-  color: #fff;
   box-sizing: border-box;
-}
-.un-selected-tab {
-  background-color: #333;
-}
-.un-selected-tab:hover {
-  background-color: #555;
 }
 .selected-tab {
   background-color: #555;
@@ -127,11 +132,6 @@ header {
 .app-li-add button {
   width: 10em;
 }
-.app-li-btn {
-  border-radius: 0;
-  color: #fff;
-  background-color: #333;
-}
 .app-li-sortable-btn {
   justify-content: space-between;
 }
@@ -159,4 +159,80 @@ header {
 }
 #create-app-form-option div p span {
   white-space: nowrap;
+}
+#folder-popup-background {
+  padding-top: 15vh;
+  padding-bottom: 15vh;
+  padding-left: 15vw;
+  padding-right: 15vw;
+}
+#folder-popup-background div {
+  width: 70vw;
+  height: 70vh;
+}
+#folder-popup-background div div {
+  width: 100%;
+  height: auto;
+  margin: 0;
+  padding: 0;
+}
+#folder-popup-main {
+  width: 100%;
+  height: auto;
+  display: flex;
+  border: 1px solid #000;
+  border-radius: 5px;
+}
+#folder-popup-background div div ul {
+  list-style: none;
+  margin: 0;
+  padding-inline-start: 0;
+  padding: 1em;
+  border-right: 1px solid #000;
+}
+
+#folder-popup-background div ul li {
+  width: fit-content;
+}
+#folder-popup-tab {
+  width: fit-content;
+  height: fit-content;
+}
+#folder-popup-tab div {
+  display: flex;
+  justify-content: space-between;
+  width: fit-content;
+  height: fit-content;
+}
+#folder-popup-tab div p {
+  display: inline;
+}
+.select-folder-li-main-button {
+  text-align: left;
+  border-radius: 0;
+  white-space: nowrap;
+  padding: 0.3em;
+}
+.select-folder-li-main-button .select-folder-li-text{
+  background-color: rgba(0, 0, 0, 0);
+}
+.select-folder-li-text {
+  display: inline-block;
+}
+.select-folder-li-main-button .select-folder-li-sub-button{
+  background-color: #ccc;
+  border-radius: 0;
+}
+.select-folder-li-sub-button {
+  display: inline-block;
+  text-align: center;
+  color: #000;
+}
+.select-folder-li-sub-button:hover {
+  background-color: #aaa;
+}
+#folder-popup-background div ul .select-folder-li-file {
+  border-radius: 5px;
+  border: 1px solid #000;
+  padding-left: 0.3em;
 }

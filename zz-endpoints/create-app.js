@@ -4,7 +4,7 @@ const fs                                         = require("fs");
 const { copyAppFolder, initialClaspSetup }       = require("../additional-modules/create-app");
 const { getFolderInfo, getFirstLevelFolderInfo } = require("../additional-modules/get-inner-path");
 const { getUid }                                 = require("../basic-modules/basic");
-const { isFile }                                 = require("../basic-modules/file")();
+const { isFile, isExists }                       = require("../basic-modules/file")();
 const { userSetting }                            = require("../basic-modules/setting");
 
 async function createApp(req, res){
@@ -52,25 +52,25 @@ const setupNewApp = async function(req, res){
       await copyAppFolder(path, template);
     }
     newObject[newAppUid] = {mainFolderId: req.body.mainFolderId, dbFolderId: req.body.dbFolderId, jsonFileId: req.body.jsonFileId, fileInfo: await getFolderInfo(path + "/edit")};
-    userSetting.set({appData: newObject, creatingAppUid: ""});
+    await userSetting.set({appData: newObject, creatingAppUid: ""});
+    await initialClaspSetup(newAppUid);
+    delete userSetting.data.appData[newAppUid].option;
+    delete userSetting.data.appData[newAppUid].mainFolderId;
+    await userSetting.set({});
     res.send(newAppUid);
-    initialClaspSetup(newAppUid);
   }
 }
 
 async function searchPathOfApp(req, res){
   let mainPath = req.body.path;
-  if(!["", null, undefined].includes(mainPath)){
+  if(["", null, undefined].includes(mainPath)){
     mainPath = userSetting.data.lastOpenedDir;
   } else{
     userSetting.set({lastOpenedDir: mainPath});
   }
-  for(const f of fs.readdirSync(mainPath)){
-    if(isFile(f) == false){
-      console.log(f);
-    }
-  }
-  res.send("test");
+  const object = await getFirstLevelFolderInfo(mainPath);
+  object.platform = process.platform;
+  res.send(object);
 }
 
 function getCreateAppOptions(req, res){
@@ -114,4 +114,14 @@ function getCreateAppOptions(req, res){
   });
 }
 
-module.exports = { createApp, searchPathOfApp, setupNewApp, getCreateAppOptions };
+async function createNewFolder(req, res){
+  const path = userSetting.data.lastOpenedDir + "/" + req.body.name;
+  if(await isExists(path)){
+    res.send(false);
+  } else {
+    fs.mkdirSync(path);
+    res.send(path);
+  }
+}
+
+module.exports = { createApp, searchPathOfApp, setupNewApp, getCreateAppOptions, createNewFolder };

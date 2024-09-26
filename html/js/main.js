@@ -24,6 +24,8 @@ function removeHorizontalScroll(){
   }
 }
 
+const remSize = $("#for-get-rem-size").height();
+
 let defaultTabHeight = 0;
 
 function setLength() {
@@ -38,6 +40,8 @@ function setLength() {
   if(windowWidth*0.4 < rightWidth){
     $("#tab-right").width(windowWidth*0.4).css("overflow-x", "scroll");
     isNeedTabScroll = true;
+  } else {
+    $("#tab-right").css("display", "inline");
   }
   const restWidth = windowWidth - $("#tab-right").width();
   const leftWidth = $("#tab-left").width();
@@ -47,7 +51,6 @@ function setLength() {
     $("#tab-middle").width(restWidth*0.3).attr("style", "width: " + restWidth*0.4 + "px; overflow-x: scroll;");
     isNeedTabScroll = true;
   }
-  const remSize = $("#for-get-rem-size").height();
   const tabHeight = isNeedTabScroll ? defaultTabHeight + remSize/2 : defaultTabHeight;
   $(".tab-div").height(tabHeight);
   let scrollBarWidth = 0;
@@ -67,7 +70,7 @@ function setLength() {
 }
 
 function getLog(command, afterFunction=()=>{}){
-  $(".command-output-background").css("display", "block");
+  $("#command-output-background").css("display", "block");
   if(command){
     $.post("/get-running-command-logs", { command }, function(data){
       console.log();

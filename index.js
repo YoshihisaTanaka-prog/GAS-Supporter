@@ -13,7 +13,9 @@ const appName = "GAS-Supporter";
 
 isExists(__dirname + "\\node_modules").then((isInstalledNodeModules)=>{
   const optionKeys = Object.keys(myOptions.options);
-  if(!isInstalledNodeModules){
+  if(isInstalledNodeModules){
+    userSetting.set({"isInstalledNodeModules": true});
+  } else {
     Command.setAll("npm install --save").runE();
     // プラットフォームごとに場合分けをする。
     write(__dirname + "\\gas-supporter.cmd", "@echo off\n\nif not %0==\"%~dp0%~nx0\" (\n  start /min cmd /c \"%~dp0%~nx0\" %*\n  exit\n)\n\ncd " + __dirname + " & node index --open");

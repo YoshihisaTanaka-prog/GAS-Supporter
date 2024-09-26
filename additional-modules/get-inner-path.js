@@ -14,7 +14,7 @@ const getFolderInfo = async function(path=""){
     }
     return returnObject;
   }
-  const loadedfolderInfo = await loadFolderInfo(path);
+  const loadedFolderInfo = await loadFolderInfo(path);
   const formattedFolderInfo = [];
   const formatFolderInfo = function(object={}, currentPath=""){
     for(const key of Object.keys(object)){
@@ -28,20 +28,27 @@ const getFolderInfo = async function(path=""){
       }
     }
   }
-  formatFolderInfo(loadedfolderInfo);
+  formatFolderInfo(loadedFolderInfo);
   return formattedFolderInfo;
 }
 
 const getFirstLevelFolderInfo = async function(path=""){
   const files = fs.readdirSync(path);
   const innerFolders = [];
+  const innerFiles = [];
   for(const file of files){
-    if(await isFile(path + "/" + file) == false){
-      const files = fs.readdirSync(path + "/" + file);
-      innerFolders.push({name: file, numOfContents: files.length});
+    try {
+      const judge = await isFile(path + "/" + file);
+      if(judge){
+        innerFiles.push(file);
+      } else if(judge == false) {
+        const files = fs.readdirSync(path + "/" + file);
+        innerFolders.push({name: file, numOfContents: files.length});
+      }
+    } catch (e) {
     }
   }
-  return {numOfContents: files.length, innerFolders: innerFolders};
+  return {myPath: path, numOfContents: files.length, innerFolders: innerFolders, innerFiles: innerFiles};
 }
 
 
