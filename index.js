@@ -37,7 +37,8 @@ isExists(__dirname + "\\node_modules").then((isInstalledNodeModules)=>{
   // setting default userInfo -----------------------------------------------------------------------------------------------
 
   if( userSetting.data.lastOpenedDir == null ){
-    userSetting.set({lastOpenedDir: "C:/Users/" + Command.setAll("whoami").runE()[0].split("\\")[1]})
+    const path = "C:/Users/" + Command.setAll("whoami").runE()[0].split("\\")[1];
+    userSetting.set({lastOpenedDir: path, defaultPath: path});
   }
   userSetting.set({creatingAppUid: ""});
 

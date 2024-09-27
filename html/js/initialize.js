@@ -41,7 +41,6 @@ function initialCheck(){
       if(data){
         setStatusInfo("selectedAppId", data);
         localStorage.setItem('tabName', "app-detail");
-        $("#main").html("");
         $("#reload-form").submit();
       } else{
         alert("予期せぬエラーが発生しました。アプリを再度作り直してください。");

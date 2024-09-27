@@ -1,9 +1,9 @@
 "use strict";
 
-const { readdirSync } = require("fs");
-const { getUid }      = require("../basic-modules/basic");
-const { isFile, read }      = require("../basic-modules/file")(["json"]);
-const { userSetting } = require("../basic-modules/setting");
+const { readdirSync }         = require("fs");
+const { getUid }              = require("../basic-modules/basic");
+const { isFile, read, write } = require("../basic-modules/file")(["json"]);
+const { userSetting }         = require("../basic-modules/setting");
 
 const sortAppOrder = async function(req, res){
   const appData = userSetting.data.appData;
@@ -38,7 +38,7 @@ const importApp = async function (req, res) {
     }
   }
   await userSetting.set({appData: newAppData});
-  write(req.body.path + "/gas-supporter-backup-data.json", newAppData[newUid]);
+  write(req.body.path + "/gas-supporter-backup-data.json", userSetting.data.appData[newUid]);
   const o = {};
   o[newUid] = {path: req.body.path, name: req.body.name};
   res.send(o);

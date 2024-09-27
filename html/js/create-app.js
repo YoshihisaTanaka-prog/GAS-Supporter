@@ -128,6 +128,7 @@ function setFolderInfo(data, isCheckIfRootFolder=true){
   });
   $("#folder-popup-content").append("<div id='folder-popup-main'><ul id='select-folder-ul'></ul></div>");
   for (const unit of data.innerFolders){
+    let selectCode = '<div class="select-folder-li-sub-button"></div>';
     if(unit.numOfContents == 0){
       selectCode = '<div class="select-folder-li-sub-button" onclick="selectedFolder(\'' + data.myPath + "/" + unit.name + '\')">選択</div>';
     }

@@ -4,7 +4,7 @@ const fs                                         = require("fs");
 const { copyAppFolder, initialClaspSetup }       = require("../additional-modules/create-app");
 const { getFolderInfo, getFirstLevelFolderInfo } = require("../additional-modules/get-inner-path");
 const { getUid }                                 = require("../basic-modules/basic");
-const { isFile, isExists }                       = require("../basic-modules/file")();
+const { isFile, isExists, read, write }          = require("../basic-modules/file")();
 const { userSetting }                            = require("../basic-modules/setting");
 
 async function createApp(req, res){
@@ -72,6 +72,11 @@ async function searchPathOfApp(req, res){
   let mainPath = req.body.path;
   if(["", null, undefined].includes(mainPath)){
     mainPath = userSetting.data.lastOpenedDir;
+    const judge = await isExists(mainPath);
+    if(judge != true){
+      mainPath = userSetting.data.defaultPath;
+      userSetting.set({lastOpenedDir: mainPath});
+    }
   } else{
     userSetting.set({lastOpenedDir: mainPath});
   }

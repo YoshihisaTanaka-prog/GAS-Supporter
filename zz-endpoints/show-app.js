@@ -1,6 +1,7 @@
 "use strict";
 
 const { getFolderInfo } = require("../additional-modules/get-inner-path");
+const { write }         = require("../basic-modules/file")(["json"]);
 const { userSetting }   = require("../basic-modules/setting");
 
 const getAppDetail = async function(req,res){
@@ -28,7 +29,7 @@ const monitorAppFolder = async function(req, res){
     const newObject = {};
     newObject[req.body.id] = {fileInfo: currentActualFiles.filter( (f) => !f.endsWith("/") )};
     await userSetting.set({appData: newObject});
-    write(newAppData.localRootPath + "/gas-supporter-backup-data.json", userSetting.data.appData[req.body.id]);
+    write(userSetting.data.appData[req.body.id].localRootPath + "/gas-supporter-backup-data.json", userSetting.data.appData[req.body.id]);
     res.send({isValid, added, deleted});
   } else {
     res.send({isValid: false});
