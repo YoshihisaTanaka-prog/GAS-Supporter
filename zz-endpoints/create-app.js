@@ -57,10 +57,13 @@ const setupNewApp = async function(req, res){
     const fileInfo = await getFolderInfo(path + "/edit");
     newObject[newAppUid] = {mainFolderId: req.body.mainFolderId, dbFolderId: req.body.dbFolderId, jsonFileId: req.body.jsonFileId, fileInfo: fileInfo.filter( (f) => !f.endsWith("/") )};
     await userSetting.set({appData: newObject, creatingAppUid: ""});
-    userSetting.data.appData[newAppUid].myId = await initialClaspSetup(newAppUid);
+    await initialClaspSetup(newAppUid);
+    const claspData = await read(newAppData.localRootPath + "/out/.clasp.json");
+    userSetting.data.appData[newAppUid].myId = claspData.scriptId;
     delete userSetting.data.appData[newAppUid].option;
     delete userSetting.data.appData[newAppUid].mainFolderId;
     await userSetting.set({});
+    write(newAppData.localRootPath + "/gas-supporter-backup-data.json", userSetting.data.appData[newAppUid]);
     res.send(newAppUid);
   }
 }

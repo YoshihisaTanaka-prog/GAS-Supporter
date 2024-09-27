@@ -26,7 +26,7 @@ const monitorAppFolder = async function(req, res){
     }
     const isValid = true;
     const newObject = {};
-    newObject[req.body.id] = {fileInfo: currentActualFiles};
+    newObject[req.body.id] = {fileInfo: currentActualFiles.filter( (f) => !f.endsWith("/") )};
     await userSetting.set({appData: newObject});
     res.send({isValid, added, deleted});
   } else {
