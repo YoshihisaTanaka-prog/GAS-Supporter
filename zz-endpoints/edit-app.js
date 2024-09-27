@@ -1,5 +1,8 @@
 "use strict";
 
+const { readdirSync } = require("fs");
+const { getUid }      = require("../basic-modules/basic");
+const { isFile }      = require("../basic-modules/file")([]);
 const { userSetting } = require("../basic-modules/setting");
 
 const sortAppOrder = async function(req, res){
@@ -12,4 +15,64 @@ const sortAppOrder = async function(req, res){
   await userSetting.sortKey("appData", req.body.order);
 };
 
-module.exports ={ sortAppOrder };
+const deleteApp = function (req, res) {
+  delete userSetting.data.appData[req.body.id];
+  userSetting.set({});
+  res.send({});
+}
+
+const importApp = function (req, res) {
+  const newAppData = {};
+  if(req.body.id){
+    newAppData[req.body.id] = {localRootPath: req.body.path, name: req.body.name};
+  } else {
+    newAppData[getUid(Object.keys(userSetting.data.appData))] = {localRootPath: req.body.path, name: req.body.name};
+  }
+  res.send(newAppData);
+  userSetting.set({appData: newAppData});
+}
+
+const checkIfImportableFolder = async function (req, res){
+  const files = readdirSync(req.body.path);
+  const innerFolders = [];
+  const innerFiles = [];
+  for(const file of files){
+    try {
+      const judge = await isFile(req.body.path + "/" + file);
+      if(judge){
+        innerFiles.push(file);
+      } else if(judge == false) {
+        innerFolders.push(file);
+      }
+    } catch (e) {
+      console.log(e);
+      innerFolders.push(file);
+    }
+  }
+  const checkObject = {innerFolders: innerFolders, innerFiles: innerFiles};
+  switch (checkObject.innerFiles.length) {
+    case 0:
+      res.send(false);
+      break;
+    case 1:
+      if(checkObject.innerFiles[0] == "gas-supporter-backup-data.json" && checkObject.innerFolders.length == 2 && checkObject.innerFolders.includes("edit") && checkObject.innerFolders.includes("out")){
+        const savedList = [];
+        for(const appDatum of Object.values(userSetting.data.appData)){
+          savedList.push(appDatum.localRootPath);
+        }
+        if(savedList.includes(req.body.path)){
+          res.send(false);
+        } else{
+          res.send(true);
+        }
+      } else{
+        res.send(false);
+      }
+      break;
+    default:
+      res.send(false);
+      break;
+  }
+}
+
+module.exports ={ sortAppOrder, deleteApp, importApp, checkIfImportableFolder };

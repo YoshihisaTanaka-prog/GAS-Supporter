@@ -14,22 +14,26 @@ const getFolderInfo = async function(path=""){
     }
     return returnObject;
   }
-  const loadedFolderInfo = await loadFolderInfo(path);
-  const formattedFolderInfo = [];
-  const formatFolderInfo = function(object={}, currentPath=""){
-    for(const key of Object.keys(object)){
-      if(![".git", "node_modules"].includes(key)){
-        if(typeof object[key] == "string"){
-          formattedFolderInfo.push(currentPath + key);
-        } else{
-          formattedFolderInfo.push(currentPath + key + "/");
-          formatFolderInfo(object[key], currentPath + key + "/");
+  if(await isFile(path) == false){
+    const loadedFolderInfo = await loadFolderInfo(path);
+    const formattedFolderInfo = [];
+    const formatFolderInfo = function(object={}, currentPath=""){
+      for(const key of Object.keys(object)){
+        if(![".git", "node_modules"].includes(key)){
+          if(typeof object[key] == "string"){
+            formattedFolderInfo.push(currentPath + key);
+          } else{
+            formattedFolderInfo.push(currentPath + key + "/");
+            formatFolderInfo(object[key], currentPath + key + "/");
+          }
         }
       }
     }
+    formatFolderInfo(loadedFolderInfo);
+    return formattedFolderInfo;
+  } else {
+    return null;
   }
-  formatFolderInfo(loadedFolderInfo);
-  return formattedFolderInfo;
 }
 
 const getFirstLevelFolderInfo = async function(path=""){

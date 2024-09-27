@@ -108,7 +108,7 @@ function setFolderInfo(data, isCheckIfRootFolder=true){
   } else{
     openParentCode = `<button onclick="selectFolder('${data.myPath.split("/").slice(0,-1).join("/")}')">親フォルダを開く</button>`;
   }
-  $("#popup-content").html("<div id='folder-popup-tab'><div><span><b>" + data.myPath + "/</b><input type='text' id='folder-popup-search'></span></div><div><p>" + openParentCode + "<button id='folder-popup-tab-create-new-folder'>新規フォルダーを作成</button></p><p align='right'><button onclick='closeFolderSelectPopup()'>閉じる</button></p></div></div>");
+  $("#folder-popup-content").html("<div id='folder-popup-tab'><div><span><b>" + data.myPath + "/</b><input type='text' id='folder-popup-search'></span></div><div><p>" + openParentCode + "<button id='folder-popup-tab-create-new-folder'>新規フォルダーを作成</button></p><p align='right'><button onclick='closeFolderSelectPopup()'>閉じる</button></p></div></div>");
   $('#folder-popup-tab-create-new-folder').on('click', function(){
     openNewFolderNameForm();
   });
@@ -126,9 +126,12 @@ function setFolderInfo(data, isCheckIfRootFolder=true){
       });
     }
   });
-  $("#popup-content").append("<div id='folder-popup-main'><ul id='select-folder-ul'></ul></div>");
+  $("#folder-popup-content").append("<div id='folder-popup-main'><ul id='select-folder-ul'></ul></div>");
   for (const unit of data.innerFolders){
-    $("#select-folder-ul").append(`<li class="select-folder-li"><button class="select-folder-li-main-button" onclick="selectFolder('${data.myPath}/${unit.name}')"><div class="select-folder-li-text">${unit.name}</div>${unit.numOfContents == 0 ? '<div class="select-folder-li-sub-button" onclick="selectedFolder(\'' + data.myPath + "/" + unit.name + '\')">選択</div>' : '<div class="select-folder-li-sub-button"></div>'}</button></li>`);
+    if(unit.numOfContents == 0){
+      selectCode = '<div class="select-folder-li-sub-button" onclick="selectedFolder(\'' + data.myPath + "/" + unit.name + '\')">選択</div>';
+    }
+    $("#select-folder-ul").append(`<li class="select-folder-li"><button class="select-folder-li-main-button" onclick="selectFolder('${data.myPath}/${unit.name}')"><div class="select-folder-li-text">${unit.name}</div>${selectCode}</button></li>`);
     currentFolders.push(unit.name);
   }
   $("#select-folder-ul").append("<li class='select-folder-li-file' style='border: none; padding-left: 0'><hr style='margin: 5px 0;'></li>");
@@ -163,7 +166,7 @@ function setFolderInfo(data, isCheckIfRootFolder=true){
     $(".select-folder-li-main-button").width(fileWidth);
   }
   const currentUlHeight = $("#select-folder-ul").height();
-  const ulHeight = $("#popup-content").height() - Number($("#popup-content").css("padding").slice(0,-2)) - $("#folder-popup-tab").height();
+  const ulHeight = $("#folder-popup-content").height() - Number($("#folder-popup-content").css("padding").slice(0,-2)) - $("#folder-popup-tab").height();
   $("#select-folder-ul").height(ulHeight);
   if(currentUlHeight > ulHeight){
     $("#select-folder-ul").css("overflow-y", "scroll").css("height", ulHeight + "px");
@@ -173,8 +176,8 @@ function setFolderInfo(data, isCheckIfRootFolder=true){
 }
 var currentHtmlCode = "";
 function openNewFolderNameForm(){
-  currentHtmlCode = $("#popup-content").html();
-  $("#popup-content").html('<form style="width: 50vw; margin-left: auto; margin-right: auto; margin-top: 10vh; text-align: center;"><p><input type="text" id="select-folder-new-name"></p><p><button type="button" onclick="createNewFolder()">決定</button>　<button type="button" onclick="closeNewFolderNameForm()">閉じる</button></p></form>');
+  currentHtmlCode = $("#folder-popup-content").html();
+  $("#folder-popup-content").html('<form style="width: 50vw; margin-left: auto; margin-right: auto; margin-top: 10vh; text-align: center;"><p><input type="text" id="select-folder-new-name"></p><p><button type="button" onclick="createNewFolder()">決定</button>　<button type="button" onclick="closeNewFolderNameForm()">閉じる</button></p></form>');
 }
 function createNewFolder(){
   const newFolderName = $("#select-folder-new-name").val();
@@ -201,11 +204,11 @@ function createNewFolder(){
   }
 }
 function closeNewFolderNameForm(){
-  $("#popup-content").html(currentHtmlCode);
+  $("#folder-popup-content").html(currentHtmlCode);
 }
 
 function closeFolderSelectPopup(){
-  $("#popup-content").html("");
+  $("#folder-popup-content").html("");
   $("#folder-popup-background").removeAttr("style");
 }
 

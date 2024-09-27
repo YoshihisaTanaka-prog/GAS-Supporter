@@ -26,7 +26,9 @@ async function createApp(req, res){
         },
         localRootPath: req.body.path,
         option: req.body.option,
-        fileInfo: []
+        fileInfo: [],
+        head: {},
+        body: {}
       };
       userSetting.set({appData: newObject, creatingAppUid: newAppUid});
       res.send({status: "success"});
@@ -51,7 +53,8 @@ const setupNewApp = async function(req, res){
     for(const template of newAppData.option.templates){
       await copyAppFolder(path, template);
     }
-    newObject[newAppUid] = {mainFolderId: req.body.mainFolderId, dbFolderId: req.body.dbFolderId, jsonFileId: req.body.jsonFileId, fileInfo: await getFolderInfo(path + "/edit")};
+    const fileInfo = await getFolderInfo(path + "/edit");
+    newObject[newAppUid] = {mainFolderId: req.body.mainFolderId, dbFolderId: req.body.dbFolderId, jsonFileId: req.body.jsonFileId, fileInfo: fileInfo.filter( (f) => !f.endsWith("/") )};
     await userSetting.set({appData: newObject, creatingAppUid: ""});
     await initialClaspSetup(newAppUid);
     delete userSetting.data.appData[newAppUid].option;

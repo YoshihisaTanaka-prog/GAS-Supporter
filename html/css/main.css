@@ -236,3 +236,16 @@ button:hover {
   border: 1px solid #000;
   padding-left: 0.3em;
 }
+
+/* アプリ詳細画面関連 */
+#app-detail-tab {
+  display: inline-block;
+}
+#app-detail-main li {
+  border: 1px solid#000;
+  border-radius: 5em;
+  margin-bottom: 2em;
+}
+#app-detail-main li ul {
+  display: none;
+}

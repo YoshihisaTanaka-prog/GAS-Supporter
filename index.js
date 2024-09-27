@@ -91,7 +91,7 @@ isExists(__dirname + "\\node_modules").then((isInstalledNodeModules)=>{
           showData[key] = {name: appData[key].name, path: appData[key].localRootPath};
         }
       }
-      await userSetting.set({});
+      userSetting.set({});
       htmlCode = htmlCode.replace("%port%", server.address().port).replace('"%appData%"', JSON.stringify(showData));
     } else {
       userSetting.set({appData: {}});

@@ -142,6 +142,10 @@ function selectedTab(id){
     default:
       if(!["app-detail", "create-app"].includes(id)){
         localStorage.setItem("selectedAppId", "");
+        setStatusInfo({selectedAppId: ""});
+      }
+      if(id != "app-selector"){
+        setStatusInfo({"importing": {id: "", name: ""}});
       }
       $.post("/", {id}, function(data){
         if(!["create-app"].includes(id)){
@@ -155,4 +159,17 @@ function selectedTab(id){
       });
       break;
   }
+}
+
+function setStatusInfo(object = {}){
+  const currentStatus = JSON.parse(localStorage.getItem("status")) || {};
+  for(const key of Object.keys(object)){
+    currentStatus[key] = object[key];
+  }
+  localStorage.setItem("status", JSON.stringify(currentStatus));
+}
+
+function getStatusInfo(key="") {
+  const currentStatus = JSON.parse(localStorage.getItem("status"));
+  return currentStatus[key];
 }

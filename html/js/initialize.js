@@ -39,7 +39,7 @@ function initialCheck(){
     }
     $.post("/setup-new-app", params, (data)=>{
       if(data){
-        localStorage.setItem("selectedAppId", data);
+        setStatusInfo("selectedAppId", data);
         localStorage.setItem('tabName', "app-detail");
         $("#main").html("");
         $("#reload-form").submit();
