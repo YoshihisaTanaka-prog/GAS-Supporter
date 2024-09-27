@@ -11,8 +11,8 @@ const sortAppOrder = async function(req, res){
   for(const key of req.body.order){
     showData[key] = {name: appData[key].name, path: appData[key].localRootPath};
   }
-  res.send(showData);
   await userSetting.sortKey("appData", req.body.order);
+  res.send(showData);
 };
 
 const deleteApp = function (req, res) {
@@ -38,6 +38,7 @@ const importApp = async function (req, res) {
     }
   }
   await userSetting.set({appData: newAppData});
+  write(req.body.path + "/gas-supporter-backup-data.json", newAppData[newUid]);
   const o = {};
   o[newUid] = {path: req.body.path, name: req.body.name};
   res.send(o);

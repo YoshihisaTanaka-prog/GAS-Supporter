@@ -28,6 +28,7 @@ const monitorAppFolder = async function(req, res){
     const newObject = {};
     newObject[req.body.id] = {fileInfo: currentActualFiles.filter( (f) => !f.endsWith("/") )};
     await userSetting.set({appData: newObject});
+    write(newAppData.localRootPath + "/gas-supporter-backup-data.json", userSetting.data.appData[req.body.id]);
     res.send({isValid, added, deleted});
   } else {
     res.send({isValid: false});
