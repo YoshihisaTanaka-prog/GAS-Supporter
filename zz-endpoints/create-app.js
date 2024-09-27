@@ -57,11 +57,9 @@ const setupNewApp = async function(req, res){
     const fileInfo = await getFolderInfo(path + "/edit");
     newObject[newAppUid] = {mainFolderId: req.body.mainFolderId, dbFolderId: req.body.dbFolderId, jsonFileId: req.body.jsonFileId, fileInfo: fileInfo.filter( (f) => !f.endsWith("/") )};
     await userSetting.set({appData: newObject, creatingAppUid: ""});
-    await initialClaspSetup(newAppUid);
+    userSetting.data.appData[newAppUid].myId = await initialClaspSetup(newAppUid);
     delete userSetting.data.appData[newAppUid].option;
     delete userSetting.data.appData[newAppUid].mainFolderId;
-    const claspData = await read(newAppData.localRootPath + "/out/.clasp.json");
-    userSetting.data.appData[newAppUid].myId = claspData.scriptId;
     await userSetting.set({});
     res.send(newAppUid);
   }
