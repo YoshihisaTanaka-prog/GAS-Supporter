@@ -39,6 +39,9 @@ const initialClaspSetup = async function(uid){
   headerContents += ("const gasSupporterDbFolderId = \"" + newAppData.dbFolderId + "\";\n\n");
   const contents = await read(newAppData.localRootPath + "/edit/gs/main.js");
   await write(newAppData.localRootPath + "/edit/gs/main.js", headerContents + contents);
+  delete newAppData.option;
+  delete newAppData.mainFolderId;
+  await write(newAppData.localRootPath + "/gas-supporter-backup-data.json", newAppData);
 }
 
 module.exports = { copyAppFolder, initialClaspSetup };

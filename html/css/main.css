@@ -239,7 +239,14 @@ button:hover {
 
 /* アプリ詳細画面関連 */
 #app-detail-tab {
-  display: inline-block;
+  display: flex;
+  padding-top: 0.5em;
+}
+.app-detail-tab-btn {
+  width: 7em;
+}
+.app-detail-tab-btn-wide {
+  width: 12em;
 }
 #app-detail-main li {
   border: 1px solid#000;

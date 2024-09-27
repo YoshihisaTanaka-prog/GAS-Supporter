@@ -2,7 +2,7 @@
 
 const { readdirSync } = require("fs");
 const { getUid }      = require("../basic-modules/basic");
-const { isFile }      = require("../basic-modules/file")([]);
+const { isFile, read }      = require("../basic-modules/file")(["json"]);
 const { userSetting } = require("../basic-modules/setting");
 
 const sortAppOrder = async function(req, res){
@@ -21,15 +21,26 @@ const deleteApp = function (req, res) {
   res.send({});
 }
 
-const importApp = function (req, res) {
+const importApp = async function (req, res) {
   const newAppData = {};
+  let newUid = "";
   if(req.body.id){
-    newAppData[req.body.id] = {localRootPath: req.body.path, name: req.body.name};
+    newUid = req.body.id;
+    newAppData[newUid] = {localRootPath: req.body.path, name: req.body.name};
   } else {
-    newAppData[getUid(Object.keys(userSetting.data.appData))] = {localRootPath: req.body.path, name: req.body.name};
+    newUid = getUid(Object.keys(userSetting.data.appData));
+    newAppData[newUid] = {localRootPath: req.body.path, name: req.body.name};
+    const backupData = await read(req.body.path + "/gas-supporter-backup-data.json");
+    for(const key of Object.keys(backupData)){
+      if(!["localRootPath", "name"].includes(key)){
+        newAppData[newUid][key] = backupData[key];
+      }
+    }
   }
-  res.send(newAppData);
-  userSetting.set({appData: newAppData});
+  await userSetting.set({appData: newAppData});
+  const o = {};
+  o[newUid] = {path: req.body.path, name: req.body.name};
+  res.send(o);
 }
 
 const checkIfImportableFolder = async function (req, res){

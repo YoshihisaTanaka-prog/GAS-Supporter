@@ -39,7 +39,7 @@ function startAppSelectorPage(){
   for(const key of Object.keys(appData)){
     $("#app-selector").append("<li class='app-li app-li-sortable' id='app-li-" + key + "'><button class='app-li-btn app-li-sortable-btn' id='app-li-" + key + "-btn' onclick='showAppDetail(\"" + key + "\")'><div class='app-li-btn-name'>" + appData[key].name + "　</div><div class='app-li-btn-path'>" + appData[key].path + "</div></button></li>");
   }
-  $("#app-selector").append('<hr><li class="app-li-add"><p><button class="app-li-btn" onclick="selectedTab(\'create-app\')">アプリの新規作成</button></p></li>');
+  $("#app-selector").append('<hr><li class="app-li-add"><p><button class="app-li-btn" onclick="selectedTab(\'create-app\')">アプリの新規作成</button><button class="app-li-btn" onclick="showImportPopup()">インポート</button></p></li>');
 
   setButton();
 
@@ -101,20 +101,29 @@ function closeImportPopup(){
   $("#folder-popup-content").html("");
 }
 
+var cachedNewAppName = "";
 function selectFolder(path=""){
+  cachedNewAppName = $("#folder-popup-tab-new-app-name").val();
   $.post("/search-path-of-app", {path}, function(data){
     setFolderInfo(data);
   });
 }
 
 function selectedFolder(path=""){
-  $.post("/import-app", {id: getStatusInfo("importing").id, path: path, name: $("#folder-popup-tab-new-app-name").val()}, function(data){
-    for(const key of Object.keys(data)){
-      appData[key] = data[key];
-    }
-    setStatusInfo({"importing": {id: "", name: ""}});
-    closeImportPopup();
-  });
+  if(["", null, undefined].includes(cachedNewAppName)){
+    alert("アプリ名を入力してください。");
+  } else{
+    $.post("/import-app", {id: getStatusInfo("importing").id, path: path, name: cachedNewAppName}, function(data){
+      let newId = "";
+      for(const key of Object.keys(data)){
+        appData[key] = data[key];
+        newId = key;
+      }
+      setStatusInfo({"importing": {id: "", name: ""}});
+      closeImportPopup();
+      showAppDetail(newId);
+    });
+  }
 }
 
 function setFolderInfo(data){
@@ -139,9 +148,14 @@ function setFolderInfo(data){
     default:
       break;
   }
-  let appName = (getStatusInfo("importing") || {}).name;
-  if([null, undefined].includes.appName){
-    appName = "";
+  let appName = "";
+  if(["", null, undefined].includes(cachedNewAppName)){
+    appName = (getStatusInfo("importing") || {}).name;
+    if([null, undefined].includes.appName){
+      appName = "";
+    }
+  } else{
+    appName = cachedNewAppName;
   }
   $("#folder-popup-content").html("<div id='folder-popup-tab'><div><span><input type='text' id='folder-popup-tab-new-app-name' value='" + appName + "'>の新しいルートフォルダ：" + data.myPath + "/<input type='text' id='folder-popup-search'></span></div><div><p>" + openParentCode + "</p><p align='right'><button onclick='closeImportPopup()'>閉じる</button></p></div></div>");
   $('#folder-popup-search').on("input", function(){

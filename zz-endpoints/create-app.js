@@ -17,6 +17,7 @@ async function createApp(req, res){
       const newObject = {};
       newObject[newAppUid] = {
         name: req.body.name,
+        myId: "",
         mainFolderId: "",
         dbFolderId: "",
         jsonFileId: "",
@@ -59,6 +60,8 @@ const setupNewApp = async function(req, res){
     await initialClaspSetup(newAppUid);
     delete userSetting.data.appData[newAppUid].option;
     delete userSetting.data.appData[newAppUid].mainFolderId;
+    const claspData = await read(newAppData.localRootPath + "/out/.clasp.json");
+    userSetting.data.appData[newAppUid].myId = claspData.scriptId;
     await userSetting.set({});
     res.send(newAppUid);
   }
