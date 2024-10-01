@@ -173,3 +173,11 @@ function getStatusInfo(key="") {
   const currentStatus = JSON.parse(localStorage.getItem("status"));
   return currentStatus[key];
 }
+
+let isDrag = false;
+$("body").on('mousedown', function() {
+  isDrag = true;
+});
+$("body").on('mouseup mouseleave', function() {
+  isDrag = false;
+});

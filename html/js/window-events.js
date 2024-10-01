@@ -4,7 +4,7 @@ window.onload = function(){
   }
   checkingData();
   initialCheck();
-  setHorizontalScroll()
+  setHorizontalScroll();
 }
 window.onwheel = function(e){
   for(const key of Object.keys(scrollStatus)){

@@ -248,11 +248,77 @@ button:hover {
 .app-detail-tab-btn-wide {
   width: 12em;
 }
-#app-detail-main li {
+#app-detail-main ul {
+  list-style: none;
+  padding-inline-start: 0;
+  padding: 1em;
+  border-radius: 5px;
+  border: 1px solid #000;
+  margin: 1em;
+}
+#app-detail-main .bordered-li {
   border: 1px solid#000;
-  border-radius: 5em;
-  margin-bottom: 2em;
+  border-radius: 5px;
+  margin: 2px;
+  padding: 0.2em;
+  display: block;
+  background-color: #fff;
 }
 #app-detail-main li ul {
+  display: none;
+  margin: 0.2em;
+  padding: 0;
+}
+#app-detail-main li ul li {
+  padding: 0.2em;
+}
+.app-detail-open-close-btn {
+  border-radius: 5px;
+  width: 2em;
+  height: 2em;
+}
+.app-detail-add-btn {
+  border-radius: 5px;
+  width: 2em;
+  height: 2em;
+}
+.app-detail-add-btn-div {
+  margin: 0;
+  padding: 0;
+  width: 2em;
+  height: 2em;
+  overflow: visible;
+  position: relative;
+}
+.app-detail-adding-type-selection {
+  position: absolute;
+  top: 2em;
+  right: 0;
+  height: 0;
+  overflow-y: hidden;
+  background-color: #fff;
+  border-radius: 5px;
+}
+.app-detail-adding-type-selection div {
+  height: fit-content;
+  width: fit-content;
+  margin: 0;
+}
+.app-detail-select-type-btn {
+  width: 10em;
+}
+.app-detail-add-original-block-btn-div {
+  margin: 0 6em 0 0;
+  padding: 0;
+  width: 6em;
+  height: 2em;
+}
+.app-detail-delete-btn {
+  width: 4em;
+}
+.app-detail-add-btn-div div div div {
+  margin: 0.5em;
+}
+#app-detail-adding-type-selection-format {
   display: none;
 }

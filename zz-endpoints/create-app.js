@@ -28,8 +28,33 @@ async function createApp(req, res){
         localRootPath: req.body.path,
         option: req.body.option,
         fileInfo: [],
-        head: {},
-        body: {}
+        gs: [],
+        head: {
+          "super-fixed-start": {
+            "type": "super-fixed-start",
+            "value": "<head",
+            "enteredValue": ""
+          },
+          "main-tag": {
+            "type": "fixed",
+            "value": "<base target=\"_top\">"
+          },
+          "super-fixed-end": {
+            "type": "super-fixed-end",
+            "value": "</head>"
+          }
+        },
+        body: {
+          "super-fixed-start": {
+            "type": "super-fixed-start",
+            "value": "<body",
+            "enteredValue": ""
+          },
+          "super-fixed-end": {
+            "type": "super-fixed-end",
+            "value": "</body>"
+          }
+        }
       };
       userSetting.set({appData: newObject, creatingAppUid: newAppUid});
       res.send({status: "success"});
@@ -55,7 +80,9 @@ const setupNewApp = async function(req, res){
       await copyAppFolder(path, template);
     }
     const fileInfo = await getFolderInfo(path + "/edit");
-    newObject[newAppUid] = {mainFolderId: req.body.mainFolderId, dbFolderId: req.body.dbFolderId, jsonFileId: req.body.jsonFileId, fileInfo: fileInfo.filter( (f) => !f.endsWith("/") )};
+    newObject[newAppUid] = {mainFolderId: req.body.mainFolderId, dbFolderId: req.body.dbFolderId, jsonFileId: req.body.jsonFileId};
+    newObject[newAppUid].fileInfo = fileInfo.filter( (f) => !f.endsWith("/") );
+    newObject[newAppUid].gs = newObject[newAppUid].fileInfo.filter( f => f.startswith("gs/") );
     await userSetting.set({appData: newObject, creatingAppUid: ""});
     await initialClaspSetup(newAppUid);
     const claspData = await read(newAppData.localRootPath + "/out/.clasp.json");

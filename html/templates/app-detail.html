@@ -1,11 +1,75 @@
 <div id="app-detail-tab">
   <button class="app-detail-tab-btn selected-tab">順序編集</button>
   <button class="app-detail-tab-btn">公開設定</button>
+  <button class="app-detail-tab-btn-wide">エディタを開く</button>
   <button class="app-detail-tab-btn">Push</button>
   <button class="app-detail-tab-btn">Deploy</button>
   <div style="width: 2em"></div>
   <button class="app-detail-tab-btn">GASを開く</button>
-  <button class="app-detail-tab-btn-wide">デバッグページを開く</button>
-  <button class="app-detail-tab-btn-wide">デプロイページを開く</button>
+  <button class="app-detail-tab-btn-wide" id="app-detail-tab-btn-open-dev">デバッグページを開く</button>
+  <button class="app-detail-tab-btn-wide" id="app-detail-tab-btn-open-exec">デプロイページを開く</button>
 </div>
 <hr style="margin-block-start: 0; margin-block-end: 0;">
+<div id="app-detail-main">
+  <ul class="sortable-ul" id="app-detail-main-ul">
+    <li class="bordered-li">
+      <div style="display: flex; justify-content: space-between;">
+        <div>
+          <button class="app-detail-open-close-btn" data-id="app-detail-gas">▶</button>
+          <b>GAS</b>
+        </div>
+        <button class="app-detail-add-btn" onclick="createGasFile();">＋</button>
+      </div>
+      <ul id="app-detail-gas">
+      </ul>
+    </li>
+    <li><hr><hr></li>
+    <li class="bordered-li">
+      <div style="display: flex; justify-content: space-between;">
+        <div>
+          <button class="app-detail-open-close-btn" data-id="app-detail-head">▶</button>
+          <b>HEAD</b>
+        </div>
+        <div class="app-detail-add-btn-div" data-id="app-detail-head">
+          <button class="app-detail-add-btn" data-id="app-detail-head">＋</button>
+        </div>
+      </div>
+      <ul id="app-detail-head" class="sortable-ul">
+      </ul>
+    </li>
+    <li><hr></li>
+    <li class="bordered-li">
+      <div style="display: flex; justify-content: space-between;">
+        <div>
+          <button class="app-detail-open-close-btn" data-id="app-detail-body">▶</button>
+          <b>BODY</b>
+        </div>
+        <div class="app-detail-add-btn-div" data-id="app-detail-body">
+          <button class="app-detail-add-btn" data-id="app-detail-body">＋</button>
+        </div>
+      </div>
+      <ul id="app-detail-body" class="sortable-ul">
+      </ul>
+    </li>
+    <li><hr></li>
+    <li class="bordered-li">
+      <b>・未設定</b>
+      <ul id="app-detail-did-not-set">
+      </ul>
+    </li>
+  </ul>
+</div>
+<div id="app-detail-adding-type-selection-format">
+  <div>
+    <div>
+      <button class="app-detail-select-type-btn" data-type="block">ブロックを追加</button>
+    </div>
+    <div>
+      <button class="app-detail-select-type-btn" data-type="file">ファイルを追加</button>
+    </div>
+    <div>
+      <button class="app-detail-select-type-btn" data-type="text">１行コードを追加</button>
+    </div>
+  </div>
+  <div></div>
+</div>

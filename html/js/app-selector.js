@@ -44,9 +44,6 @@ function startAppSelectorPage(){
   setButton();
 
   $(function(){
-    if(getStatusInfo("isImporting")){
-      setStatusInfo({"isImporting": false});
-    }
     $("#app-selector").sortable({
       items: "li:not(.app-li-add)"
     });
