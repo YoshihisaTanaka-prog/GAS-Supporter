@@ -1,4 +1,5 @@
 var cachedAppData = {};
+var openedIdList = [];
 
 if(["", null, undefined].includes(getStatusInfo("selectedAppId"))){
   selectedTab("app-selector");
@@ -30,7 +31,7 @@ function writeContentStructure(){
           tagCode = tagCode + '<div style="display: flex; justify-content: space-between;">';
           tagCode = tagCode + '  <div>';
           tagCode = tagCode + '    <button class="app-detail-open-close-btn" data-id="' + newId + '">▶</button>';
-          tagCode = tagCode + '    <b>Original Block</b>';
+          tagCode = tagCode + '    <b><input type="text" class="app-detail-input" value="' + unit.enteredValue + '" data-keypath="' + currentId.slice(1) + "-" + key + '" style="width: 70vw;"></b>';
           tagCode = tagCode + '  </div>';
           tagCode = tagCode + '  <div class="app-detail-add-btn-div app-detail-add-original-block-btn-div" data-id="' + newId + '">';
           tagCode = tagCode + '    <button class="app-detail-add-btn" data-id="' + newId + '">＋</button>';
@@ -46,7 +47,7 @@ function writeContentStructure(){
         case "super-fixed-start":
           var newLiElement = $("<li>", {class: "bordered-li", "data-key": key});
           newLiElement.text(unit.value + " ");
-          newLiElement.append("<input type='text' value='" + unit.enteredValue + "' style='width: 70vw;'>>");
+          newLiElement.append("<input type='text' class='app-detail-input' data-keypath='" + currentId.slice(1) + "-" + key + "' value='" + unit.enteredValue + "' style='width: 70vw;'>>");
           $(currentId).append(newLiElement);
           if(keyLength == 2){
             $(currentId).append("<li class='sortable-li' style='font-size: 0.2rem; padding: 0;'>&nbsp;</li>");
@@ -79,7 +80,7 @@ function writeContentStructure(){
           if(unit.value.endsWith(".js")){
             const newChildLiElements = [$("<li></li>"), $("<li></li>"), $("<li></li>")];
             newChildLiElements[0].text("<script ");
-            newChildLiElements[0].append("<input type='text' value='" + unit.enteredValue + "' style='width: 70vw;'>>" + selectButtonCode + deleteButtonCode);
+            newChildLiElements[0].append("<input type='text' class='app-detail-input' data-keypath='" + currentId.slice(1) + "-" + key + "' value='" + unit.enteredValue + "' style='width: 70vw;'>>" + selectButtonCode + deleteButtonCode);
             newChildLiElements[1].text("ファイル：" + displayText);
             newChildLiElements[2].text("</script>");
             const newUlElement = $("<ul></ul>").css("display", "block").css("margin", 0).css("border", "none");
@@ -90,7 +91,7 @@ function writeContentStructure(){
           } else if(unit.value.endsWith(".css")){
             const newChildLiElements = [$("<li></li>"), $("<li></li>"), $("<li></li>")];
             newChildLiElements[0].text("<style ");
-            newChildLiElements[0].append("<input type='text' value='" + unit.enteredValue + "' style='width: 70vw;'>>" + selectButtonCode + deleteButtonCode);
+            newChildLiElements[0].append("<input type='text' class='app-detail-input' data-keypath='" + currentId.slice(1) + "-" + key + "' value='" + unit.enteredValue + "' style='width: 70vw;'>>" + selectButtonCode + deleteButtonCode);
             newChildLiElements[1].text("ファイル：" + displayText);
             newChildLiElements[2].text("</style>");
             const newUlElement = $("<ul></ul>").css("display", "block").css("margin", 0).css("border", "none");
@@ -104,8 +105,12 @@ function writeContentStructure(){
           }
           $(currentId).append(newLiElement);
           break;
+        case "cdn-css":
+          break;
+        case "cdn-js":
+          break;
         case "text":
-          $(currentId).append("<li class='bordered-li sortable-li' data-from='" + currentId + "' data-key='" + key + "'><input type='text' value='" + unit.value + "' style='width: 80vw;'>" + deleteButtonCode + "</li>");
+          $(currentId).append("<li class='bordered-li sortable-li' data-from='" + currentId + "' data-key='" + key + "'><input type='text' class='app-detail-input' data-keypath='" + currentId.slice(1) + "-" + key + "' value='" + unit.enteredValue + "' style='width: 80vw;'>" + deleteButtonCode + "</li>");
         default:
           break;
       }
@@ -137,6 +142,19 @@ function writeContentStructure(){
   $("#app-detail-did-not-set").css("display", "block");
   setButton();
   setSortSystem();
+  $(".app-detail-input").off("change");
+  setTimeout(() => {
+    $(".app-detail-input").on("change", function(){
+      const keyPath = $(this).data("keypath").slice(11);
+      const enteredValue = $(this).val();
+      const param = { keyPath, enteredValue };
+      param.id = cachedAppData.id;
+      $.post("/update-constructor-value", param, function(data){
+        cachedAppData = data;
+        writeContentStructure();
+      });
+    });
+  }, 1);
 }
 
 function setButton(){
@@ -159,8 +177,6 @@ function setButton(){
     sfe.children("div").eq(1).attr("id", myDataId + "-type-selection-sub");
     sfe.find("button").attr("data-id", myDataId).on("click", function(){
       addItem($(this).data("id"), $(this).data("type"));
-      $(".app-detail-adding-type-selection").removeAttr("style");
-      $(".app-detail-add-btn").removeAttr("style")
     });
     sfe.hover(()=>{},()=>{
       $(".app-detail-adding-type-selection").removeAttr("style");
@@ -191,7 +207,15 @@ function setButton(){
     if($("#" + childId).attr("style")){
       $("#" + childId).removeAttr("style");
       $(this).text("▶");
+      openedIdList = openedIdList.filter( id => id != childId );
     } else {
+      $("#" + childId).attr("style", "display: block;");
+      $(this).text("▼");
+      openedIdList.push(childId);
+    }
+  }).each(function(){
+    const childId = $(this).data("id");
+    if(openedIdList.includes(childId)){
       $("#" + childId).attr("style", "display: block;");
       $(this).text("▼");
     }
@@ -227,14 +251,17 @@ function setSortSystem(){
 }
 
 function addItem(id, type){
-  console.log("called addItem", id, type);
   switch(type){
     case "file":
+      console.log($("#" + id + "-type-selection-sub").text());
       break;
     case "cdn":
+      console.log($("#" + id + "-type-selection-sub").text());
       break;
     default:
       addConstructor(id, type);
+      $(".app-detail-adding-type-selection").removeAttr("style");
+      $(".app-detail-add-btn").removeAttr("style")
       break;
   }
 }

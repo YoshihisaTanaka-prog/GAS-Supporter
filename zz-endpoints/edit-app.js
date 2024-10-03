@@ -88,6 +88,44 @@ const checkIfImportableFolder = async function (req, res){
   }
 }
 
+const sortGasList = async function(req, res){
+  const newObject = {};
+  newObject[req.body.id] = {gs: req.body.orderedList};
+  await userSetting.set({appData: newObject});
+  getAppDetail(req, res);
+}
+
+const updateConstructorValue = async function(req, res){
+  const keys = req.body.keyPath.split('-');
+  if(req.body.keyPath.endsWith("super-fixed-start")){
+    keys.splice(-3, 3, "super-fixed-start");
+  }
+  if(req.body.keyPath.endsWith("cdn-css")){
+    keys.splice(-2, 2, "cdn-css");
+  }
+  if(req.body.keyPath.endsWith("cdn-js")){
+    keys.splice(-2, 2, "cdn-js");
+  }
+  const obj1 = {};
+  obj1[req.body.id] = {};
+  const objectList = [obj1];
+  for(const key of keys){
+    const obj = {};
+    obj[key] = {};
+    objectList.push(obj);
+  }
+  keys.unshift(req.body.id);
+  keys.push("enteredValue");
+  const obj2 = {};
+  obj2.enteredValue = req.body.enteredValue;
+  objectList.push(obj2);
+  for(let i=keys.length-1; i>0; i--){
+    objectList[i-1][keys[i-1]] = objectList[i];
+  }
+  userSetting.set({appData: objectList[0]});
+  getAppDetail(req, res);
+}
+
 const addConstructor = async function(req, res){
   let cachedAppData = userSetting.data.appData[req.body.id];
   const obj = {};
@@ -100,24 +138,39 @@ const addConstructor = async function(req, res){
     objectList.push(obj);
     cachedAppData = cachedAppData[key];
   }
-  const newObject = {type: req.body.type};
-  if(newObject.type == "block"){
-    newObject.value = {};
-  } else if(newObject.type == "file"){
-    if(["", null, undefined].includes(req.body.fileName)){
-      newObject.value = "";
-    } else{
-      newObject.value = req.body.fileName;
-      if(req.body.fileName.endsWith(".js") || req.body.fileName.endsWith(".css")){
-        newObject.enteredValue = "";
-      }
-    }
-  } else{
-    newObject.value = "";
-  }
   const cachedAppDataKeys = Object.keys(cachedAppData);
-  const newUid = getUid(cachedAppDataKeys);
-  objectList[keys.length][keys[keys.length-1]][newUid] = newObject;
+  if(req.body.type == "cdn"){
+    const newObject = {};
+    for(const unit of req.body.units){
+      const newUnit = {};
+      newUnit.type = "cdn-" + unit.type;
+      newUnit.url = unit.url;
+      const newUid = getUid(Object.keys(newObject).concat(cachedAppDataKeys));
+      newObject[newUid] = newUnit;
+    }
+    objectList[keys.length][keys[keys.length-1]] = newObject;
+  } else{
+    const newObject = {type: req.body.type};
+    if(newObject.type == "block"){
+      newObject.enteredValue = "Original Block";
+      newObject.value = {};
+    } else if(newObject.type == "file"){
+      if(["", null, undefined].includes(req.body.fileName)){
+        newObject.value = "";
+      } else{
+        newObject.value = req.body.fileName;
+        if(req.body.fileName.endsWith(".js") || req.body.fileName.endsWith(".css")){
+          newObject.enteredValue = "";
+        }
+      }
+    } else if(newObject.type == "text"){
+      newObject.enteredValue = "";
+    } else{
+      newObject.value = "";
+    }
+    const newUid = getUid(cachedAppDataKeys);
+    objectList[keys.length][keys[keys.length-1]][newUid] = newObject;
+  }
   for(let i=keys.length; i>0; i--){
     const key = i == 1 ? req.body.id : keys[i-2];
     objectList[i-1][key] = objectList[i];
@@ -172,13 +225,6 @@ const sortConstructor = async function(req, res){
   getAppDetail(req, res);
 }
 
-const sortGasList = async function(req, res){
-  const newObject = {};
-  newObject[req.body.id] = {gs: req.body.orderedList};
-  await userSetting.set({appData: newObject});
-  getAppDetail(req, res);
-}
-
 const deleteConstructor = async function(req, res){
   let cachedAppData = userSetting.data.appData[req.body.id];
   const keys = req.body.keyPath.split("-");
@@ -195,4 +241,4 @@ const deleteConstructor = async function(req, res){
   getAppDetail(req, res);
 }
 
-module.exports ={ sortAppOrder, deleteApp, importApp, checkIfImportableFolder, addConstructor, deleteConstructor, sortConstructor, sortGasList, moveConstructor };
+module.exports ={ sortAppOrder, deleteApp, importApp, checkIfImportableFolder, addConstructor, deleteConstructor, sortConstructor, sortGasList, moveConstructor, updateConstructorValue };
