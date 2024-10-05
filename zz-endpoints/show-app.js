@@ -43,4 +43,8 @@ const monitorAppFolder = async function(req, res){
   }
 }
 
-module.exports = { getAppDetail, monitorAppFolder };
+const getMyCdns = async function(req, res) {
+  res.send(userSetting.data.cdns);
+}
+
+module.exports = { getAppDetail, monitorAppFolder, getMyCdns };

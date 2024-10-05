@@ -100,12 +100,6 @@ const updateConstructorValue = async function(req, res){
   if(req.body.keyPath.endsWith("super-fixed-start")){
     keys.splice(-3, 3, "super-fixed-start");
   }
-  if(req.body.keyPath.endsWith("cdn-css")){
-    keys.splice(-2, 2, "cdn-css");
-  }
-  if(req.body.keyPath.endsWith("cdn-js")){
-    keys.splice(-2, 2, "cdn-js");
-  }
   const obj1 = {};
   obj1[req.body.id] = {};
   const objectList = [obj1];
@@ -117,13 +111,21 @@ const updateConstructorValue = async function(req, res){
   keys.unshift(req.body.id);
   keys.push("enteredValue");
   const obj2 = {};
-  obj2.enteredValue = req.body.enteredValue;
-  objectList.push(obj2);
-  for(let i=keys.length-1; i>0; i--){
-    objectList[i-1][keys[i-1]] = objectList[i];
+  for(const key of ["enteredValue", "type", "title", "value"]){
+    if(req.body[key]){
+      obj2[key] = req.body[key];
+    }
   }
-  userSetting.set({appData: objectList[0]});
-  getAppDetail(req, res);
+  if(Object.keys(obj2).length == 0){
+    getAppDetail(req,res);
+  } else{
+    objectList.push(obj2);
+    for(let i=keys.length-1; i>0; i--){
+      objectList[i-1][keys[i-1]] = objectList[i];
+    }
+    userSetting.set({appData: objectList[0]});
+    getAppDetail(req, res);
+  }
 }
 
 const addConstructor = async function(req, res){
@@ -139,14 +141,17 @@ const addConstructor = async function(req, res){
     cachedAppData = cachedAppData[key];
   }
   const cachedAppDataKeys = Object.keys(cachedAppData);
+  const finalKeys = cachedAppDataKeys
   if(req.body.type == "cdn"){
     const newObject = {};
     for(const unit of req.body.units){
       const newUnit = {};
       newUnit.type = "cdn-" + unit.type;
-      newUnit.url = unit.url;
+      newUnit.title = unit.title;
+      newUnit.value = unit.value;
       const newUid = getUid(Object.keys(newObject).concat(cachedAppDataKeys));
       newObject[newUid] = newUnit;
+      finalKeys.push(newUid);
     }
     objectList[keys.length][keys[keys.length-1]] = newObject;
   } else{
@@ -170,6 +175,7 @@ const addConstructor = async function(req, res){
     }
     const newUid = getUid(cachedAppDataKeys);
     objectList[keys.length][keys[keys.length-1]][newUid] = newObject;
+    finalKeys.push(newUid);
   }
   for(let i=keys.length; i>0; i--){
     const key = i == 1 ? req.body.id : keys[i-2];
@@ -177,8 +183,8 @@ const addConstructor = async function(req, res){
   }
   await userSetting.set({appData: objectList[0]});
   if(["head", "body"].includes(req.body.keyPath)){
-    const sortedKeys = cachedAppDataKeys;
-    sortedKeys.splice(-1,0, newUid);
+    const sortedKeys = finalKeys.filter( key => key != "super-fixed-end" );
+    sortedKeys.push("super-fixed-end");
     await userSetting.sortKey("appData." + req.body.id + "." + keys.join("."), sortedKeys);
   }
   getAppDetail(req, res);

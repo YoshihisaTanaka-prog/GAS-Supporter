@@ -77,7 +77,6 @@ function sendNewAppInfo(){
 function selectFolder(path=""){
   $("#folder-popup-background").css("display", "block");
   $.post("/search-path-of-app", {path}, function(data){
-    console.log(data);
     setFolderInfo(data);
   });
 }

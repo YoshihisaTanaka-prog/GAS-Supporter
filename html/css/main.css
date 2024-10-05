@@ -17,6 +17,9 @@ body {
 header {
   width: 100vw;
 }
+#main {
+  box-sizing: border-box;
+}
 .center-form {
   border-radius: 2em;
   padding: 5em;
@@ -321,4 +324,118 @@ button:hover {
 }
 #app-detail-adding-type-selection-format {
   display: none;
+}
+#app-detail-edit-cdn-format {
+  display: none;
+}
+.app-detail-edit-cdn {
+  display: inline-block;
+  top: 0em;
+  right: 0;
+  z-index: 10;
+}
+#app-detail-edit-cdn-main {
+  padding: 0;
+  margin: 0;
+}
+#app-detail-edit-cdn-main p {
+  margin-block: 0.1em;
+}
+#app-detail-edit-cdn-main p:first-child {
+  position: absolute;
+  width: fit-content;
+  white-space: nowrap;
+  top: 0;
+  right: 0;
+  margin-block: 0;
+}
+#app-detail-edit-cdn-main p:last-child {
+  text-align: center;
+  margin-block-end: 0;
+  margin-block-start: 0.2em;
+}
+#app-detail-edit-cdn-main hr {
+  margin-block: 0;
+}
+#app-detail-edit-cdn-main form {
+  padding: 0;
+  border-radius: 0;
+  border: none;
+  display: flex;
+}
+#app-detail-edit-cdn-main form ul {
+  display: block;
+  width: fit-content;
+  list-style: none;
+  padding-inline-start: 0;
+  margin-block: 0;
+  border: none;
+}
+#app-detail-edit-cdn-main form ul li {
+  white-space: nowrap;
+  padding: 0.2em;
+}
+#app-detail-edit-cdn-main form ul li p:first-child {
+  position: static;
+  width: auto;
+}
+#app-detail-edit-cdn-main form ul .space-between {
+  display: flex;
+  justify-content: space-between;
+}
+#app-detail-edit-cdn-main form ul .space-between span:first-child {
+  margin-right: 1em;
+}
+#app-detail-edit-cdn-main form ul li div {
+  margin: 0;
+}
+#app-detail-edit-cdn-main form ul li button {
+  font-size: 0.8em;
+  padding-inline: 1em;
+  border-radius: 1em;
+}
+#app-detail-edit-cdn-main form ul li label {
+  white-space: nowrap;
+}
+#app-detail-edit-cdn-sub {
+  padding: 0;
+  margin: 0;
+  display: none;
+  width: 70vw;
+}
+#app-detail-edit-cdn-sub div {
+  margin: 0;
+  padding: 0;
+  width: auto;
+}
+#app-detail-edit-cdn-sub p {
+  text-align: center;
+  margin-block: 0;
+}
+#app-detail-edit-cdn-sub hr {
+  margin-block: 0.2em;
+}
+#app-detail-edit-cdn-sub input {
+  box-sizing: border-box;
+}
+#app-detail-edit-cdn-sub .wide-input {
+  width: calc( 88% - 0.3em );
+}
+#app-detail-edit-cdn-sub .thin-input {
+  width: calc( 12% - 0.3em );
+}
+.app-detail-select-cdn-btn-div {
+  overflow: visible;
+  position: relative;
+  display: inline-block;
+}
+.app-detail-cdn-header-div {
+  display: flex;
+  justify-content: space-between;
+}
+.app-detail-group-cdn-code-p {
+  display: flex;
+  justify-content: space-between;
+  font-size:0.7em;
+  margin-block: 0;
 }

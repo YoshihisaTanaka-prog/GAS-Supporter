@@ -1,5 +1,15 @@
 const scrollStatus = {};
 
+function setIgnoreKeyDown(className=""){
+  $("." + className).on("keydown",function(ev){
+    if ((ev.which && ev.which === 13) ||(ev.keyCode && ev.keyCode === 13)){
+      return false;
+    } else {
+      return true;
+    }
+  });
+}
+
 function setHorizontalScroll() {
   for(const pos of ["left", "middle", "right"]){
     addHorizontalScroll("tab-" + pos);
@@ -73,7 +83,6 @@ function getLog(command, afterFunction=()=>{}){
   $("#command-output-background").css("display", "block");
   if(command){
     $.post("/get-running-command-logs", { command }, function(data){
-      console.log();
       if(data.isRunning){
         $("#command-output").html(">> <b>" + command + "</b><br><br><div id='command-output-detail' style='overflow-wrap: break-word; word-break: break-all;'></div>");
         $("#command-output-detail").text(data.details.join("\n"));

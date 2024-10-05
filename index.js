@@ -6,6 +6,7 @@ const Command                           = require("./basic-modules/exec")();
 const { read, isFile, isExists, write } = require("./basic-modules/file")([ 'cmd', 'css', 'html', 'js', 'json', 'txt' ]);
 const { userSetting }                   = require("./basic-modules/setting");
 const endpoints                         = require("./endpoints");
+const { group } = require("console");
 
 const appName = "GAS-Supporter";
 
@@ -36,11 +37,16 @@ isExists(__dirname + "\\node_modules").then((isInstalledNodeModules)=>{
 
   // setting default userInfo -----------------------------------------------------------------------------------------------
 
+  const userSettingSetObject = {creatingAppUid: ""};
   if( userSetting.data.lastOpenedDir == null ){
     const path = "C:/Users/" + Command.setAll("whoami").runE()[0].split("\\")[1];
-    userSetting.set({lastOpenedDir: path, defaultPath: path});
+    userSettingSetObject.lastOpenedDir = path;
+    userSettingSetObject.defaultPath = path;
   }
-  userSetting.set({creatingAppUid: ""});
+  if( userSetting.data.cdns == null ){
+    userSettingSetObject.cdns = {css: {}, js: {}, group: {}};
+  }
+  userSetting.set(userSettingSetObject);
 
   // setting server -------------------------------------------------------------------------------------------------------------------------------------------------
 
